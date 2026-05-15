@@ -403,6 +403,26 @@
       'voice.suggestions.desc': 'Prova a dire una di queste — il bot è configurato per inciampare su ognuna, dando a SENTRY molto da segnalare.',
 
       'alert.detected': 'VIOLAZIONE RILEVATA',
+
+      // tickets — translated to Italian
+      'tickets.title': 'Ticket di conformità · remediazioni automatiche',
+      'tickets.kpi.open': 'Ticket aperti',
+      'tickets.kpi.open.sub': 'in attesa di remediazione',
+      'tickets.kpi.exposure': 'Esposizione stimata',
+      'tickets.kpi.exposure.sub': 'multe potenziali se non risolte',
+      'tickets.kpi.resolved': 'Risolti',
+      'tickets.kpi.resolved.sub': 'chiusi',
+      'tickets.kpi.total': 'Totale ticket',
+      'tickets.kpi.total.sub': 'storico completo',
+      'tickets.list': 'Coda di remediazione',
+      'tickets.list.desc': 'Ogni avviso o critico rilevato da SENTRY diventa un ticket qui, con un costo stimato se non risolto e una proposta di correzione.',
+      'tickets.filter.all': 'Tutti',
+      'tickets.filter.open': 'Aperti',
+      'tickets.filter.in_progress': 'In corso',
+      'tickets.filter.resolved': 'Risolti',
+      'tickets.filter.dismissed': 'Respinti',
+
+      // architecture — intentionally left in English (technical docs convention)
     },
 
     zh: {
