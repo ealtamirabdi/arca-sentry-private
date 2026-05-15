@@ -16,6 +16,8 @@ const REG_LABELS = {
 let sessionId = null;
 let currentProfile = 'banking';
 let isThinking = false;
+let sessionMsgs = 0;
+let sessionFlags = 0;
 
 (async function init() {
   await pingHealth();
@@ -147,7 +149,13 @@ async function sendMessage(text) {
     // Alert banner if violation
     if (data.severity === 'critical' || data.severity === 'warning') {
       showAlert(data);
+      sessionFlags++;
     }
+    sessionMsgs++;
+    const ms = document.querySelector('#hero-stat-msgs');
+    const fs = document.querySelector('#hero-stat-flags');
+    if (ms) ms.textContent = sessionMsgs;
+    if (fs) fs.textContent = sessionFlags;
   } catch (e) {
     replaceThinking(thinkingId, `(error: ${e.message})`, 'advisory', 'allow');
     $('#sentry-sub').textContent = 'error · check logs';
