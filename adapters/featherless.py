@@ -12,6 +12,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+from collections import defaultdict
 from dataclasses import dataclass
 from typing import Any
 
@@ -21,8 +22,15 @@ log = logging.getLogger(__name__)
 
 FEATHERLESS_BASE_URL = os.getenv("FEATHERLESS_BASE_URL", "https://api.featherless.ai/v1")
 FEATHERLESS_API_KEY = os.getenv("FEATHERLESS_API_KEY", "")
-DEFAULT_TIMEOUT = float(os.getenv("FEATHERLESS_TIMEOUT", "20.0"))
-DEFAULT_MAX_RETRIES = int(os.getenv("FEATHERLESS_MAX_RETRIES", "2"))
+DEFAULT_TIMEOUT = float(os.getenv("FEATHERLESS_TIMEOUT", "30.0"))
+DEFAULT_MAX_RETRIES = int(os.getenv("FEATHERLESS_MAX_RETRIES", "3"))
+
+# Per-model concurrency cap. Featherless rate-limits concurrent calls to the
+# same model — serializing them avoids 429s when multiple agents share a
+# model. One in-flight call per model at a time.
+_MODEL_SEMAPHORES: dict[str, asyncio.Semaphore] = defaultdict(
+    lambda: asyncio.Semaphore(int(os.getenv("FEATHERLESS_MODEL_CONCURRENCY", "1")))
+)
 
 
 @dataclass(slots=True)
@@ -84,30 +92,43 @@ class FeatherlessClient:
         headers = {"Authorization": f"Bearer {self.api_key}"}
         url = f"{self.base_url}/chat/completions"
 
-        last_exc: Exception | None = None
-        for attempt in range(DEFAULT_MAX_RETRIES + 1):
-            try:
-                r = await self._client.post(url, json=payload, headers=headers)
-                r.raise_for_status()
-                data = r.json()
-                choice = data["choices"][0]["message"]["content"]
-                usage = data.get("usage", {})
-                return ChatCompletion(
-                    content=choice,
-                    model=data.get("model", model),
-                    tokens_prompt=usage.get("prompt_tokens", 0),
-                    tokens_completion=usage.get("completion_tokens", 0),
-                    raw=data,
-                )
-            except (httpx.HTTPError, KeyError) as exc:
-                last_exc = exc
-                if attempt < DEFAULT_MAX_RETRIES:
-                    backoff = 0.5 * (2**attempt)
-                    log.warning(
-                        "featherless.retry",
-                        extra={"attempt": attempt, "backoff": backoff, "error": str(exc)},
+        # Serialize calls to the same model — Featherless free/premium tiers
+        # rate-limit concurrent invocations of the same model.
+        sem = _MODEL_SEMAPHORES[model]
+        async with sem:
+            last_exc: Exception | None = None
+            for attempt in range(DEFAULT_MAX_RETRIES + 1):
+                try:
+                    r = await self._client.post(url, json=payload, headers=headers)
+                    if r.status_code == 429:
+                        # Honor server-suggested backoff if present.
+                        backoff = float(r.headers.get("retry-after", 1.5 + attempt))
+                        log.warning(
+                            "featherless.429_retry",
+                            extra={"attempt": attempt, "backoff": backoff, "model": model},
+                        )
+                        await asyncio.sleep(backoff)
+                        continue
+                    r.raise_for_status()
+                    data = r.json()
+                    choice = data["choices"][0]["message"]["content"]
+                    usage = data.get("usage", {})
+                    return ChatCompletion(
+                        content=choice,
+                        model=data.get("model", model),
+                        tokens_prompt=usage.get("prompt_tokens", 0),
+                        tokens_completion=usage.get("completion_tokens", 0),
+                        raw=data,
                     )
-                    await asyncio.sleep(backoff)
-                else:
-                    raise
-        raise RuntimeError(f"unreachable: {last_exc}")
+                except (httpx.HTTPError, KeyError) as exc:
+                    last_exc = exc
+                    if attempt < DEFAULT_MAX_RETRIES:
+                        backoff = 0.5 * (2**attempt)
+                        log.warning(
+                            "featherless.retry",
+                            extra={"attempt": attempt, "backoff": backoff, "error": str(exc)},
+                        )
+                        await asyncio.sleep(backoff)
+                    else:
+                        raise
+            raise RuntimeError(f"unreachable: {last_exc}")

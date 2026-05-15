@@ -108,7 +108,13 @@ class AuditorAgent(ABC):
             f"--- Actor: {interaction.actor} ---\n\n"
             f"User request:\n{interaction.request}\n\n"
             f"AI response:\n{interaction.response}\n\n"
-            'Respond ONLY with strict JSON of shape: '
+            "IMPORTANT — multilingual rules:\n"
+            "• The interaction may be in English, Spanish, Italian, French or any other language.\n"
+            "• Apply the SAME flagging logic regardless of the source language. A violation in\n"
+            "  Spanish or Italian is equally serious as the same violation in English.\n"
+            "• You may write the `rationale` in the source language of the interaction, but\n"
+            "  the JSON keys (`confidence`, `article`, `rationale`) MUST be in English.\n\n"
+            "Respond ONLY with strict JSON of shape: "
             '{"confidence": 0.0-1.0, "article": "<regulation article or null>", '
             '"rationale": "<one paragraph>"}'
         )
