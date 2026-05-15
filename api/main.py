@@ -32,7 +32,7 @@ from core.event_store import EventStore
 from core.orchestrator import Orchestrator
 from synthesizer.gemini_client import Synthesizer
 
-from api.routes import alerts, audit, reports, demo, stats, playground
+from api.routes import alerts, audit, reports, demo, stats, playground, tickets
 
 log = logging.getLogger(__name__)
 
@@ -78,6 +78,7 @@ async def lifespan(app: FastAPI):
     demo.set_state(state)
     stats.set_state(state)
     playground.set_state(state)
+    tickets.set_state(state)
 
     yield
 
@@ -101,6 +102,7 @@ app.include_router(reports.router)
 app.include_router(demo.router)
 app.include_router(stats.router)
 app.include_router(playground.router)
+app.include_router(tickets.router)
 
 
 @app.get("/health")

@@ -93,21 +93,43 @@ def classify_severity(
 ) -> Severity:
     """Derive overall severity from a set of findings on the same interaction.
 
-    Rules:
-      - critical: at least N agents (default 3) flagged with confidence >= critical
-      - warning:  any single agent flagged with confidence >= warning
-      - advisory: any single agent flagged with confidence >= advisory
-      - else:     no flag — never reaches this layer
+    Rules (in order — first match wins):
+      1. CRITICAL — any of the following:
+         a. 2+ agents flagged with confidence >= critical threshold
+            (multiple regulations violated at once = compound risk)
+         b. A single agent flagged with confidence >= 0.95
+            (irrefutable evidence — bot literally leaked API key, etc.)
+         c. Both prompt_injection AND pii_leak in the same interaction
+            (credential + data exfil = active breach pattern)
+      2. WARNING — any single agent flagged with confidence >= warning threshold
+      3. ADVISORY — any single agent flagged with confidence >= advisory threshold
+      4. ADVISORY (default) — no clear flag
     """
     t = thresholds or SeverityThresholds.from_env()
     if not findings:
         return Severity.ADVISORY
 
+    # 1a — multiple agents agree at critical level (2+, not 3+)
     critical_hits = sum(1 for f in findings if f.confidence >= t.critical)
-    if critical_hits >= t.critical_requires_consensus:
+    if critical_hits >= 2:
         return Severity.CRITICAL
 
+    # 1b — single agent with overwhelming confidence
+    if any(f.confidence >= 0.95 for f in findings):
+        return Severity.CRITICAL
+
+    # 1c — compound breach pattern: credential leak + data leak together
+    regulations = {f.regulation for f in findings if f.confidence >= 0.7}
+    if Regulation.PROMPT_INJECTION in regulations and Regulation.PII_LEAK in regulations:
+        return Severity.CRITICAL
+
+    # 1d — three distinct regulations flagged at warning+ level = systemic
+    if len(regulations) >= 3:
+        return Severity.CRITICAL
+
+    # 2 — warning
     if any(f.confidence >= t.warning for f in findings):
         return Severity.WARNING
 
+    # 3, 4 — advisory
     return Severity.ADVISORY

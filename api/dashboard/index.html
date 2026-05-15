@@ -5,89 +5,95 @@
 <title>ARCA SENTRY — Compliance Operations Center</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/dashboard/static/style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body>
 
 <header class="topbar">
   <div class="brand">
-    <span class="brand-pulse"></span>
-    <span class="brand-name">ARCA <strong>SENTRY</strong></span>
-    <span class="brand-sub">Compliance Operations Center</span>
+    <div class="brand-logo"><span class="brand-logo-letter">S</span></div>
+    <div class="brand-text">
+      <div class="brand-name">ARCA <strong>SENTRY</strong></div>
+      <div class="brand-sub" data-i18n="brand.sub.ops">Compliance Operations Center</div>
+    </div>
   </div>
   <nav class="tabs">
-    <a href="/dashboard/" class="tab active">Dashboard</a>
-    <a href="/dashboard/playground.html" class="tab">Playground</a>
-    <a href="/dashboard/voice.html" class="tab">Voice</a>
-    <a href="https://github.com/ealtamirabdi/arca-sentry" target="_blank" class="tab">GitHub →</a>
+    <a href="/dashboard/" class="tab active"><i data-lucide="layout-dashboard"></i><span data-i18n="nav.dashboard">Dashboard</span></a>
+    <a href="/dashboard/tickets.html" class="tab"><i data-lucide="ticket"></i><span data-i18n="nav.tickets">Tickets</span></a>
+    <a href="/dashboard/playground.html" class="tab"><i data-lucide="message-square"></i><span data-i18n="nav.playground">Playground</span></a>
+    <a href="/dashboard/voice.html" class="tab"><i data-lucide="mic"></i><span data-i18n="nav.voice">Voice</span></a>
   </nav>
-  <div class="status-pill">
-    <span class="dot" id="status-dot"></span>
-    <span id="status-text">connecting…</span>
-    <span class="status-meta" id="status-meta"></span>
+  <div class="topbar-right">
+    <div class="status-pill">
+      <span class="dot" id="status-dot"></span>
+      <span id="status-text" data-i18n="status.connecting">connecting…</span>
+      <span class="status-meta" id="status-meta"></span>
+    </div>
   </div>
 </header>
 
 <main>
 
-  <!-- ════════ KPI ROW ════════ -->
+  <!-- KPI ROW -->
   <section class="kpi-row">
     <div class="kpi kpi-primary">
-      <div class="kpi-label">Compliance rate</div>
-      <div class="kpi-value" id="kpi-compliance">—</div>
-      <div class="kpi-suffix">last 24h</div>
+      <div class="kpi-label"><i data-lucide="shield-check" class="kpi-icon"></i><span data-i18n="kpi.compliance">Compliance rate</span></div>
+      <div class="kpi-value" id="kpi-compliance" data-target="0">—</div>
+      <div class="kpi-suffix"><span data-i18n="kpi.compliance.sub">last 24h</span></div>
+      <canvas class="kpi-spark" id="spark-compliance"></canvas>
     </div>
     <div class="kpi kpi-critical">
-      <div class="kpi-label">Critical violations</div>
-      <div class="kpi-value" id="kpi-critical">—</div>
-      <div class="kpi-suffix">blocked at gateway</div>
+      <div class="kpi-label"><i data-lucide="shield-alert" class="kpi-icon"></i><span data-i18n="kpi.critical">Critical violations</span></div>
+      <div class="kpi-value" id="kpi-critical" data-target="0">—</div>
+      <div class="kpi-suffix"><span data-i18n="kpi.critical.sub">blocked at gateway</span></div>
     </div>
     <div class="kpi kpi-warning">
-      <div class="kpi-label">Warnings</div>
-      <div class="kpi-value" id="kpi-warning">—</div>
-      <div class="kpi-suffix">compliance team notified</div>
+      <div class="kpi-label"><i data-lucide="alert-triangle" class="kpi-icon"></i><span data-i18n="kpi.warning">Warnings</span></div>
+      <div class="kpi-value" id="kpi-warning" data-target="0">—</div>
+      <div class="kpi-suffix"><span data-i18n="kpi.warning.sub">compliance team notified</span></div>
     </div>
     <div class="kpi kpi-volume">
-      <div class="kpi-label">Interactions audited</div>
-      <div class="kpi-value" id="kpi-total">—</div>
-      <div class="kpi-suffix"><span id="kpi-rate">0</span>/min · live</div>
+      <div class="kpi-label"><i data-lucide="activity" class="kpi-icon"></i><span data-i18n="kpi.total">Interactions audited</span></div>
+      <div class="kpi-value" id="kpi-total" data-target="0">—</div>
+      <div class="kpi-suffix"><span class="live-dot"></span><span id="kpi-rate">0</span>/min · live</div>
     </div>
   </section>
 
-  <!-- ════════ DEMO BAR ════════ -->
+  <!-- DEMO BAR -->
   <section class="card demo-bar">
     <div class="card-head">
-      <h2>Try it live</h2>
-      <p class="muted">Click a scenario to run a synthetic AI interaction through the full pipeline. Six pre-loaded violations across EU AI Act, GDPR, DORA, PII and prompt injection — in English, Spanish and Italian.</p>
+      <h2 data-i18n="demo.title">Try it live</h2>
+      <p class="muted" data-i18n="demo.desc">Click a scenario to run a synthetic AI interaction through the full pipeline. Six pre-loaded violations across EU AI Act, GDPR, DORA, PII and prompt injection — in English, Spanish and Italian.</p>
     </div>
     <div class="scenarios" id="scenarios"></div>
   </section>
 
-  <!-- ════════ CHARTS ROW ════════ -->
+  <!-- CHARTS -->
   <section class="charts-row">
     <div class="card chart-card">
-      <h2>Compliance overview</h2>
-      <p class="muted">24h breakdown</p>
+      <h2 data-i18n="chart.donut.title">Compliance overview</h2>
+      <p class="muted" data-i18n="chart.donut.sub">24h breakdown</p>
       <div class="chart-wrap"><canvas id="chart-donut"></canvas></div>
     </div>
     <div class="card chart-card chart-wide">
-      <h2>Violations timeline</h2>
-      <p class="muted">Interactions vs warnings vs criticals, hourly buckets</p>
+      <h2 data-i18n="chart.timeline.title">Violations timeline</h2>
+      <p class="muted" data-i18n="chart.timeline.sub">Interactions vs warnings vs criticals, hourly buckets</p>
       <div class="chart-wrap"><canvas id="chart-timeline"></canvas></div>
     </div>
   </section>
 
   <section class="charts-row">
     <div class="card chart-card chart-wide">
-      <h2>Top regulations flagged</h2>
-      <p class="muted">Findings by regulation, last 24h</p>
+      <h2 data-i18n="chart.regs.title">Top regulations flagged</h2>
+      <p class="muted" data-i18n="chart.regs.sub">Findings by regulation, last 24h</p>
       <div class="chart-wrap"><canvas id="chart-regulations"></canvas></div>
     </div>
     <div class="card chart-card">
-      <h2>Auditor council</h2>
-      <p class="muted">5 specialized agents, current load</p>
+      <h2 data-i18n="chart.council.title">Auditor council</h2>
+      <p class="muted" data-i18n="chart.council.sub">5 specialized agents, current load</p>
       <div class="agent-grid" id="agent-grid">
         <div class="agent" data-name="eu_ai_act_auditor"><div class="agent-name">EU AI Act</div><div class="agent-state">idle</div></div>
         <div class="agent" data-name="gdpr_auditor"><div class="agent-name">GDPR</div><div class="agent-state">idle</div></div>
@@ -98,31 +104,31 @@
     </div>
   </section>
 
-  <!-- ════════ LIVE FEED ════════ -->
+  <!-- LIVE FEED -->
   <section class="card live-feed">
     <div class="card-head feed-head">
       <div>
-        <h2>Live event stream</h2>
-        <p class="muted">Click any row for full forensic detail · auto-refreshes every 3 s</p>
+        <h2 data-i18n="feed.title">Live event stream</h2>
+        <p class="muted" data-i18n="feed.desc">Click any row for full forensic detail · auto-refreshes every 3 s</p>
       </div>
       <div class="feed-filters">
-        <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="critical">Critical</button>
-        <button class="filter-btn" data-filter="warning">Warning</button>
-        <button class="filter-btn" data-filter="advisory">Advisory</button>
+        <button class="filter-btn active" data-filter="all" data-i18n="feed.filter.all">All</button>
+        <button class="filter-btn" data-filter="critical" data-i18n="feed.filter.critical">Critical</button>
+        <button class="filter-btn" data-filter="warning" data-i18n="feed.filter.warning">Warning</button>
+        <button class="filter-btn" data-filter="advisory" data-i18n="feed.filter.advisory">Advisory</button>
       </div>
     </div>
     <div class="feed-table-wrap">
       <table class="feed-table">
         <thead>
           <tr>
-            <th>Time</th>
-            <th>Severity</th>
-            <th>Channel</th>
-            <th>Actor</th>
-            <th>Snippet</th>
-            <th>Findings</th>
-            <th>Action</th>
+            <th data-i18n="feed.col.time">Time</th>
+            <th data-i18n="feed.col.severity">Severity</th>
+            <th data-i18n="feed.col.channel">Channel</th>
+            <th data-i18n="feed.col.actor">Actor</th>
+            <th data-i18n="feed.col.snippet">Snippet</th>
+            <th data-i18n="feed.col.findings">Findings</th>
+            <th data-i18n="feed.col.action">Action</th>
             <th></th>
           </tr>
         </thead>
@@ -135,25 +141,28 @@
 
 </main>
 
-<!-- ════════ DETAIL DRAWER ════════ -->
+<!-- DETAIL DRAWER -->
 <div class="drawer-backdrop" id="drawer-backdrop"></div>
 <aside class="drawer" id="drawer">
   <div class="drawer-head">
     <div>
-      <div class="drawer-title">Audit detail</div>
+      <div class="drawer-title" data-i18n="drawer.title">Audit detail</div>
       <div class="drawer-subtitle" id="drawer-iid">—</div>
     </div>
     <button class="drawer-close" id="drawer-close">✕</button>
   </div>
-  <div class="drawer-body" id="drawer-body">
-    <!-- filled dynamically -->
-  </div>
+  <div class="drawer-body" id="drawer-body"></div>
 </aside>
 
 <footer class="footer">
-  ARCA SENTRY · MIT · <a href="https://github.com/ealtamirabdi/arca-sentry" target="_blank">github.com/ealtamirabdi/arca-sentry</a> · Built by B Drive IT for AI Agent Olympics, Milan 2026
+  ARCA SENTRY · Continuous compliance auditing for enterprise AI
 </footer>
 
 <script src="/dashboard/static/app.js"></script>
+<script src="/dashboard/static/i18n.js"></script>
+<script>
+  // Initialize Lucide icons after DOM is ready
+  if (window.lucide) window.lucide.createIcons();
+</script>
 </body>
 </html>

@@ -8,22 +8,25 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/dashboard/static/style.css">
 <link rel="stylesheet" href="/dashboard/static/playground.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body class="playground-page">
 
 <header class="topbar">
   <div class="brand">
-    <span class="brand-pulse"></span>
-    <span class="brand-name">ARCA <strong>SENTRY</strong></span>
-    <span class="brand-sub">Live Playground · talk to a vulnerable bot, watch SENTRY audit</span>
+    <div class="brand-logo"><span class="brand-logo-letter">S</span></div>
+    <div class="brand-text">
+      <div class="brand-name">ARCA <strong>SENTRY</strong></div>
+      <div class="brand-sub" data-i18n="brand.sub.playground">Live Playground</div>
+    </div>
   </div>
   <nav class="tabs">
-    <a href="/dashboard/" class="tab">Dashboard</a>
-    <a href="/dashboard/playground.html" class="tab active">Playground</a>
-    <a href="/dashboard/voice.html" class="tab">Voice</a>
-    <a href="https://github.com/ealtamirabdi/arca-sentry" target="_blank" class="tab">GitHub →</a>
+    <a href="/dashboard/" class="tab"><i data-lucide="layout-dashboard"></i><span data-i18n="nav.dashboard">Dashboard</span></a>
+    <a href="/dashboard/tickets.html" class="tab"><i data-lucide="ticket"></i><span data-i18n="nav.tickets">Tickets</span></a>
+    <a href="/dashboard/playground.html" class="tab active"><i data-lucide="message-square"></i><span data-i18n="nav.playground">Playground</span></a>
+    <a href="/dashboard/voice.html" class="tab"><i data-lucide="mic"></i><span data-i18n="nav.voice">Voice</span></a>
   </nav>
-  <div class="status-pill"><span class="dot" id="status-dot"></span><span id="status-text">connecting…</span></div>
+  <div class="status-pill"><span class="dot" id="status-dot"></span><span id="status-text" data-i18n="status.connecting">connecting…</span></div>
 </header>
 
 <!-- Critical alert banner — appears when SENTRY blocks/warns -->
@@ -41,24 +44,23 @@
   <!-- ════════ TOP TOOLBAR ════════ -->
   <section class="playground-toolbar card">
     <div class="toolbar-left">
-      <label for="profile-select">Bot under audit:</label>
+      <label for="profile-select" data-i18n="pg.toolbar.bot_label">Bot under audit:</label>
       <select id="profile-select" class="profile-select">
         <option value="banking">🏦 ACME Bank (banking)</option>
         <option value="insurance">🛡️ ACME Insurance</option>
         <option value="healthcare">🏥 ACME Health</option>
       </select>
-      <button class="btn-reset" id="btn-reset">↺ Reset conversation</button>
+      <button class="btn-reset" id="btn-reset" data-i18n="pg.toolbar.reset">↺ Reset conversation</button>
     </div>
     <div class="toolbar-hint">
-      The bot is <strong>intentionally vulnerable</strong> for demo purposes.
-      Try the suggested attacks below or type your own.
+<span data-i18n="pg.toolbar.hint_html" data-i18n-html>The bot is <strong>intentionally vulnerable</strong> for demo purposes. Try the suggested attacks below or type your own.</span>
     </div>
   </section>
 
   <!-- ════════ SUGGESTED ATTACKS ════════ -->
   <section class="card">
-    <h2>Try one of these</h2>
-    <p class="muted">Click any prompt to send it to the bot and watch SENTRY react.</p>
+    <h2 data-i18n="pg.suggested.title">Try one of these</h2>
+    <p class="muted" data-i18n="pg.suggested.desc">Click any prompt to send it to the bot and watch SENTRY react.</p>
     <div class="suggested-grid" id="suggested-grid"></div>
   </section>
 
@@ -68,26 +70,26 @@
     <!-- LEFT: chat with vulnerable bot -->
     <div class="card chat-pane">
       <div class="chat-head">
-        <h2>Conversation</h2>
+        <h2 data-i18n="pg.conversation.title">Conversation</h2>
         <span class="chat-actor" id="chat-actor">vulnerable-demo-bot · banking</span>
       </div>
       <div class="chat-messages" id="chat-messages">
         <div class="empty-chat">
-          <p>Start typing below — or click a suggested attack above.</p>
-          <p class="muted small">Every exchange is audited by SENTRY in real time.</p>
+          <p data-i18n="pg.empty.line1">Start typing below — or click a suggested attack above.</p>
+          <p class="muted small" data-i18n="pg.empty.line2">Every exchange is audited by SENTRY in real time.</p>
         </div>
       </div>
       <form class="chat-input" id="chat-input-form">
-        <input type="text" id="chat-input" placeholder="Type a message to the bot… (Enter to send)" autocomplete="off">
-        <button type="submit" id="chat-send">Send →</button>
+        <input type="text" id="chat-input" data-i18n-placeholder="pg.input.placeholder" placeholder="Type a message to the bot… (Enter to send)" autocomplete="off">
+        <button type="submit" id="chat-send" data-i18n="pg.send">Send →</button>
       </form>
     </div>
 
     <!-- RIGHT: SENTRY watching -->
     <div class="card sentry-pane">
       <div class="sentry-head">
-        <h2>SENTRY · live audit</h2>
-        <span class="sentry-sub" id="sentry-sub">awaiting interaction…</span>
+        <h2 data-i18n="pg.sentry.title">SENTRY · live audit</h2>
+        <span class="sentry-sub" id="sentry-sub" data-i18n="pg.sentry.awaiting">awaiting interaction…</span>
       </div>
 
       <div class="agent-grid playground-agents" id="playground-agents">
@@ -99,7 +101,7 @@
       </div>
 
       <div class="verdict-box empty" id="verdict-box">
-        <div class="verdict-empty-msg">No interactions audited yet.</div>
+        <div class="verdict-empty-msg" data-i18n="pg.sentry.empty_verdict">No interactions audited yet.</div>
       </div>
 
       <div class="findings-stack" id="findings-stack"></div>
@@ -110,9 +112,11 @@
 </main>
 
 <footer class="footer">
-  ARCA SENTRY · MIT · <a href="https://github.com/ealtamirabdi/arca-sentry" target="_blank">github.com/ealtamirabdi/arca-sentry</a> · Built by B Drive IT for AI Agent Olympics, Milan 2026
+  ARCA SENTRY · Continuous compliance auditing for enterprise AI
 </footer>
 
 <script src="/dashboard/static/playground.js"></script>
+<script src="/dashboard/static/i18n.js"></script>
+<script>if (window.lucide) window.lucide.createIcons();</script>
 </body>
 </html>

@@ -1,7 +1,7 @@
-// ARCA SENTRY — Voice page logic.
-// Uses Web Speech API for STT (browser) and the browser's SpeechSynthesis
-// API for TTS. Server-side Speechmatics integration is wired but optional
-// for the demo (Web Speech is instant and works offline).
+// ARCA SENTRY — Voice page.
+// Uses Web Speech API for STT + a Web Audio analyser to visualize the mic
+// level so the user has clear visual feedback that audio is being captured.
+// SpeechSynthesis is used to read the bot's reply back.
 
 'use strict';
 
@@ -20,12 +20,20 @@ let recognition = null;
 let isRecording = false;
 let currentLang = 'en-US';
 let lastFinalText = '';
-let liveLineEl = null;
+let liveTextNode = null;
+
+// Web Audio analyser for mic level visualization
+let audioCtx = null;
+let analyser = null;
+let micStream = null;
+let levelRAF = 0;
+let micGranted = false;
 
 (function init() {
   pingHealth();
   setupSpeechRecognition();
   bindEvents();
+  ensureLevelMeter();
 })();
 
 function pingHealth() {
@@ -37,12 +45,32 @@ function pingHealth() {
   });
 }
 
+/* ───────────────────────── Mic level meter UI injection ───────────────────────── */
+
+function ensureLevelMeter() {
+  // Inject a level meter inside the transcript head if not already there.
+  if ($('#mic-level-wrap')) return;
+  const head = document.querySelector('.transcript-head');
+  if (!head) return;
+  const wrap = document.createElement('div');
+  wrap.id = 'mic-level-wrap';
+  wrap.className = 'mic-level-wrap';
+  wrap.innerHTML = `
+    <span class="mic-level-label">mic</span>
+    <div class="mic-level-bar"><div class="mic-level-fill" id="mic-level-fill"></div></div>
+    <span class="mic-level-state" id="mic-level-state">off</span>
+  `;
+  head.appendChild(wrap);
+}
+
+/* ───────────────────────── Speech Recognition ───────────────────────── */
+
 function setupSpeechRecognition() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) {
     $('#mic-btn').disabled = true;
     $('#mic-btn .mic-label').textContent = 'Not supported';
-    $('#transcript-state').textContent = 'Use Chrome or Safari for voice — your browser lacks Web Speech API';
+    setTranscriptState('Use Chrome or Safari — your browser lacks Web Speech API', false);
     return;
   }
   recognition = new SR();
@@ -53,9 +81,8 @@ function setupSpeechRecognition() {
   recognition.onstart = () => {
     isRecording = true;
     $('#mic-btn').classList.add('recording');
-    $('#mic-btn .mic-label').textContent = 'Listening…';
-    $('#transcript-state').textContent = '● recording';
-    $('#transcript-state').classList.add('live');
+    $('#mic-btn .mic-label').textContent = 'Listening — release';
+    setTranscriptState('● recording — speak now', true);
     appendUserLine('', true);
   };
 
@@ -67,8 +94,9 @@ function setupSpeechRecognition() {
       if (r.isFinal) final += r[0].transcript;
       else interim += r[0].transcript;
     }
-    if (liveLineEl) {
-      liveLineEl.textContent = (final + interim).trim() || '…';
+    const display = (final + interim).trim();
+    if (liveTextNode && display) {
+      liveTextNode.textContent = display;
     }
     if (final) {
       lastFinalText = final.trim();
@@ -76,82 +104,171 @@ function setupSpeechRecognition() {
   };
 
   recognition.onerror = (e) => {
-    $('#transcript-state').textContent = 'mic error: ' + e.error;
-    $('#transcript-state').classList.remove('live');
     isRecording = false;
     $('#mic-btn').classList.remove('recording');
     $('#mic-btn .mic-label').textContent = 'Hold to talk';
+    let msg = 'mic error: ' + e.error;
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+      msg = '❌ Microphone permission denied. Enable in Safari → Settings → Websites → Microphone';
+    } else if (e.error === 'no-speech') {
+      msg = '⚠ No speech detected — try again, speak louder';
+    } else if (e.error === 'audio-capture') {
+      msg = '❌ No microphone found. Plug one in and reload.';
+    } else if (e.error === 'network') {
+      msg = '❌ Web Speech needs network connectivity (it uploads audio to Apple/Google)';
+    }
+    setTranscriptState(msg, false);
   };
 
   recognition.onend = async () => {
     isRecording = false;
     $('#mic-btn').classList.remove('recording');
     $('#mic-btn .mic-label').textContent = 'Hold to talk';
-    $('#transcript-state').classList.remove('live');
 
-    if (liveLineEl && lastFinalText) {
-      liveLineEl.classList.remove('partial');
-      liveLineEl.textContent = lastFinalText;
+    if (liveTextNode && lastFinalText) {
+      liveTextNode.parentElement.classList.remove('partial');
+      liveTextNode.textContent = lastFinalText;
+    } else if (liveTextNode && !lastFinalText) {
+      // No transcript produced — remove the empty partial line
+      liveTextNode.parentElement.remove();
     }
 
     if (!lastFinalText) {
-      $('#transcript-state').textContent = 'no speech detected';
+      setTranscriptState('no speech captured — try again', false);
       return;
     }
 
-    $('#transcript-state').textContent = 'auditing…';
+    setTranscriptState('auditing…', false);
     await processUtterance(lastFinalText);
     lastFinalText = '';
-    liveLineEl = null;
+    liveTextNode = null;
+    setTranscriptState('tap mic to start', false);
   };
 }
 
+/* ───────────────────────── Mic level via Web Audio API ───────────────────────── */
+
+async function acquireMic() {
+  if (micGranted) return true;
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    const src = audioCtx.createMediaStreamSource(micStream);
+    src.connect(analyser);
+    micGranted = true;
+    pumpLevel();
+    return true;
+  } catch (err) {
+    micGranted = false;
+    let msg = '❌ Cannot access microphone: ' + (err.message || err.name || 'unknown');
+    if (err.name === 'NotAllowedError') {
+      msg = '❌ Permission denied. Safari → Settings → Websites → Microphone → Allow for this site';
+    } else if (err.name === 'NotFoundError') {
+      msg = '❌ No microphone detected on this machine';
+    }
+    setTranscriptState(msg, false);
+    $('#mic-level-state').textContent = 'denied';
+    return false;
+  }
+}
+
+function pumpLevel() {
+  if (!analyser) return;
+  const data = new Uint8Array(analyser.frequencyBinCount);
+  function frame() {
+    if (!analyser) return;
+    analyser.getByteTimeDomainData(data);
+    let max = 0;
+    for (let i = 0; i < data.length; i++) {
+      const v = Math.abs(data[i] - 128) / 128;
+      if (v > max) max = v;
+    }
+    const pct = Math.min(100, Math.round(max * 220));
+    const fill = $('#mic-level-fill');
+    if (fill) fill.style.width = pct + '%';
+    const state = $('#mic-level-state');
+    if (state) state.textContent = isRecording ? (pct > 8 ? 'capturing' : 'silence') : 'ready';
+    levelRAF = requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+/* ───────────────────────── Events ───────────────────────── */
+
 function bindEvents() {
   const mic = $('#mic-btn');
-  mic.addEventListener('click', () => {
+  mic.addEventListener('click', async () => {
     if (!recognition) return;
+
+    // 1. If the bot is currently speaking, the click interrupts it.
+    //    Cancel the TTS and immediately go into listening mode — natural
+    //    "talk over the assistant" behavior.
+    if (window.speechSynthesis && window.speechSynthesis.speaking) {
+      try { window.speechSynthesis.cancel(); } catch {}
+      $('#mic-btn').classList.remove('speaking');
+      setTranscriptState('interrupted bot · ready to listen', false);
+      // fall through to start recording
+    }
+
+    // 2. If already recording, stop (don't start a new session on top).
     if (isRecording) {
       recognition.stop();
-    } else {
-      recognition.lang = currentLang;
-      try {
-        recognition.start();
-      } catch (e) {
-        $('#transcript-state').textContent = 'cannot start: ' + e.message;
-      }
+      return;
+    }
+
+    // 3. Otherwise: acquire mic permission + start a new session.
+    const ok = await acquireMic();
+    if (!ok) return;
+
+    recognition.lang = currentLang;
+    try {
+      recognition.start();
+    } catch (e) {
+      // recognition.start() throws InvalidStateError if a previous session
+      // is still finalizing. Wait a tick and try again.
+      setTranscriptState('starting…', false);
+      setTimeout(() => {
+        try { recognition.start(); } catch {}
+      }, 300);
     }
   });
 
   $('#lang-select').addEventListener('change', (e) => {
     currentLang = e.target.value;
+    setTranscriptState('language: ' + currentLang, false);
   });
 
   $('#alert-close').onclick = () => $('#alert-banner').classList.remove('show');
 }
 
+function setTranscriptState(text, live) {
+  const el = $('#transcript-state');
+  if (!el) return;
+  el.textContent = text;
+  el.classList.toggle('live', !!live);
+}
+
+/* ───────────────────────── Transcript stream ───────────────────────── */
+
 function appendUserLine(text, partial) {
   const stream = $('#transcript-stream');
-  // remove empty state
   const empty = stream.querySelector('.empty-chat');
   if (empty) empty.remove();
 
-  const el = document.createElement('div');
-  el.className = 'transcript-line user' + (partial ? ' partial' : '');
-  el.textContent = text || '…';
+  const wrap = document.createElement('div');
+  wrap.className = 'transcript-line user' + (partial ? ' partial' : '');
   const meta = document.createElement('div');
   meta.className = 'meta';
   meta.textContent = `user · ${currentLang}`;
-  el.prepend(meta);
-  stream.appendChild(el);
+  const body = document.createElement('div');
+  body.textContent = text || '…';
+  wrap.appendChild(meta);
+  wrap.appendChild(body);
+  stream.appendChild(wrap);
   stream.scrollTop = stream.scrollHeight;
-  if (partial) liveLineEl = el.lastChild;  // the text node after meta
-  // ensure we keep a reference to the text container, not the meta
-  if (partial) {
-    const textNode = document.createElement('span');
-    textNode.textContent = '…';
-    el.appendChild(textNode);
-    liveLineEl = textNode;
-  }
+  if (partial) liveTextNode = body;
 }
 
 function appendBotLine(text, severity, action) {
@@ -162,15 +279,16 @@ function appendBotLine(text, severity, action) {
   meta.className = 'meta';
   meta.textContent = `bot · severity: ${severity} · action: ${action}`;
   el.appendChild(meta);
-  const txt = document.createElement('div');
-  txt.textContent = text;
-  el.appendChild(txt);
+  const body = document.createElement('div');
+  body.textContent = text;
+  el.appendChild(body);
   stream.appendChild(el);
   stream.scrollTop = stream.scrollHeight;
 }
 
+/* ───────────────────────── Submit to /playground/chat ───────────────────────── */
+
 async function processUtterance(userText) {
-  // Animate agents auditing
   $$('.playground-agents .agent').forEach((el) => {
     el.classList.add('active');
     el.classList.remove('flagged');
@@ -179,7 +297,6 @@ async function processUtterance(userText) {
   $('#sentry-sub').textContent = 'auditing…';
 
   try {
-    // Hit playground/chat with channel forced to voice via metadata
     const r = await fetch('/playground/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -189,11 +306,8 @@ async function processUtterance(userText) {
     const data = await r.json();
 
     appendBotLine(data.bot_reply, data.severity, data.action_taken);
-
-    // TTS the bot reply (if available)
     speakText(data.bot_reply, currentLang);
 
-    // Reflect agents
     const flagged = new Set((data.findings || []).map((f) => f.agent));
     $$('.playground-agents .agent').forEach((el) => {
       el.classList.remove('active');
@@ -212,11 +326,9 @@ async function processUtterance(userText) {
     if (data.severity === 'critical' || data.severity === 'warning') {
       showAlert(data);
     }
-    $('#transcript-state').textContent = 'tap mic to start';
   } catch (e) {
     appendBotLine('(error: ' + e.message + ')', 'advisory', 'allow');
     $('#sentry-sub').textContent = 'error · check logs';
-    $('#transcript-state').textContent = 'tap mic to start';
   }
 }
 
@@ -281,15 +393,34 @@ function showAlert(data) {
 function speakText(text, lang) {
   if (!window.speechSynthesis) return;
   try {
+    // Always cancel any in-flight TTS before queuing a new one.
+    window.speechSynthesis.cancel();
+
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = lang;
     utter.rate = 1.0;
-    utter.pitch = 1.0;
-    // try to pick a voice that matches lang
     const voices = window.speechSynthesis.getVoices();
-    const match = voices.find((v) => v.lang === lang) || voices.find((v) => v.lang.startsWith(lang.slice(0, 2)));
+    const match = voices.find((v) => v.lang === lang)
+              || voices.find((v) => v.lang.startsWith(lang.slice(0, 2)));
     if (match) utter.voice = match;
-    window.speechSynthesis.cancel();
+
+    // Visual feedback on the mic button while bot is speaking.
+    utter.onstart = () => {
+      $('#mic-btn').classList.add('speaking');
+      $('#mic-btn .mic-label').textContent = '⏹ tap to interrupt';
+      setTranscriptState('bot speaking…', false);
+    };
+    utter.onend = () => {
+      $('#mic-btn').classList.remove('speaking');
+      $('#mic-btn .mic-label').textContent = window.i18n
+        ? window.i18n.t('voice.mic.idle')
+        : 'Hold to talk';
+      setTranscriptState(window.i18n
+        ? window.i18n.t('voice.transcript.idle')
+        : 'tap mic to start', false);
+    };
+    utter.onerror = utter.onend;
+
     window.speechSynthesis.speak(utter);
   } catch (e) {
     console.warn('TTS failed', e);

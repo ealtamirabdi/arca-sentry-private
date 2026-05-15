@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ARCA SENTRY — Compliance Tickets</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/dashboard/static/style.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-logo"><span class="brand-logo-letter">S</span></div>
+    <div class="brand-text">
+      <div class="brand-name">ARCA <strong>SENTRY</strong></div>
+      <div class="brand-sub" data-i18n="tickets.title">Compliance tickets · auto-generated remediations</div>
+    </div>
+  </div>
+  <nav class="tabs">
+    <a href="/dashboard/" class="tab"><i data-lucide="layout-dashboard"></i><span data-i18n="nav.dashboard">Dashboard</span></a>
+    <a href="/dashboard/tickets.html" class="tab active"><i data-lucide="ticket"></i><span data-i18n="nav.tickets">Tickets</span></a>
+    <a href="/dashboard/playground.html" class="tab"><i data-lucide="message-square"></i><span data-i18n="nav.playground">Playground</span></a>
+    <a href="/dashboard/voice.html" class="tab"><i data-lucide="mic"></i><span data-i18n="nav.voice">Voice</span></a>
+  </nav>
+  <div class="topbar-right">
+    <div class="status-pill">
+      <span class="dot" id="status-dot"></span>
+      <span id="status-text" data-i18n="status.connecting">connecting…</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- Summary KPIs -->
+  <section class="kpi-row">
+    <div class="kpi kpi-critical">
+      <div class="kpi-label"><i data-lucide="alert-octagon" class="kpi-icon"></i><span>Open tickets</span></div>
+      <div class="kpi-value" id="kpi-open">—</div>
+      <div class="kpi-suffix">awaiting remediation</div>
+    </div>
+    <div class="kpi kpi-warning">
+      <div class="kpi-label"><i data-lucide="wallet" class="kpi-icon"></i><span>Estimated exposure</span></div>
+      <div class="kpi-value" id="kpi-exposure">—</div>
+      <div class="kpi-suffix">potential fines if not remediated</div>
+    </div>
+    <div class="kpi kpi-primary">
+      <div class="kpi-label"><i data-lucide="check-circle" class="kpi-icon"></i><span>Resolved</span></div>
+      <div class="kpi-value" id="kpi-resolved">—</div>
+      <div class="kpi-suffix">closed out</div>
+    </div>
+    <div class="kpi kpi-volume">
+      <div class="kpi-label"><i data-lucide="archive" class="kpi-icon"></i><span>Total tickets</span></div>
+      <div class="kpi-value" id="kpi-total">—</div>
+      <div class="kpi-suffix">all time</div>
+    </div>
+  </section>
+
+  <!-- Filters -->
+  <section class="card">
+    <div class="card-head feed-head">
+      <div>
+        <h2 data-i18n="tickets.list">Remediation queue</h2>
+        <p class="muted" data-i18n="tickets.list.desc">Every warning or critical detected by SENTRY becomes a ticket here, with an estimated cost if left unresolved and a suggested fix.</p>
+      </div>
+      <div class="feed-filters">
+        <button class="filter-btn active" data-status="">All</button>
+        <button class="filter-btn" data-status="open">Open</button>
+        <button class="filter-btn" data-status="in_progress">In progress</button>
+        <button class="filter-btn" data-status="resolved">Resolved</button>
+        <button class="filter-btn" data-status="dismissed">Dismissed</button>
+      </div>
+    </div>
+    <div id="tickets-list" class="ticket-section">
+      <div class="muted" style="padding:24px;text-align:center;">Loading tickets…</div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  ARCA SENTRY · Continuous compliance auditing for enterprise AI
+</footer>
+
+<script src="/dashboard/static/tickets.js"></script>
+<script src="/dashboard/static/i18n.js"></script>
+<script>
+  if (window.lucide) window.lucide.createIcons();
+</script>
+</body>
+</html>

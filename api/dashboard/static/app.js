@@ -205,10 +205,10 @@ async function refreshKPIs() {
     const r = await fetch('/stats/summary');
     if (!r.ok) return;
     const d = await r.json();
-    $('#kpi-compliance').textContent = d.compliance_rate.toFixed(1) + '%';
-    $('#kpi-critical').textContent = d.violations.critical;
-    $('#kpi-warning').textContent = d.violations.warning;
-    $('#kpi-total').textContent = d.total_interactions;
+    animateNumber('#kpi-compliance', d.compliance_rate, { decimals: 1, suffix: '%' });
+    animateNumber('#kpi-critical', d.violations.critical);
+    animateNumber('#kpi-warning', d.violations.warning);
+    animateNumber('#kpi-total', d.total_interactions);
     $('#kpi-rate').textContent = d.interactions_per_minute;
 
     chartDonut.data.datasets[0].data = [
@@ -218,6 +218,25 @@ async function refreshKPIs() {
     ];
     chartDonut.update('none');
   } catch (e) { /* keep last values */ }
+}
+
+function animateNumber(selector, target, opts = {}) {
+  const el = document.querySelector(selector);
+  if (!el) return;
+  const decimals = opts.decimals || 0;
+  const suffix = opts.suffix || '';
+  const start = parseFloat((el.textContent || '0').replace(/[^\d.-]/g, '')) || 0;
+  const duration = 700;
+  const startTs = performance.now();
+  function tick(ts) {
+    const t = Math.min(1, (ts - startTs) / duration);
+    const ease = 1 - Math.pow(1 - t, 3);
+    const v = start + (target - start) * ease;
+    el.textContent = v.toFixed(decimals) + suffix;
+    if (t < 1) requestAnimationFrame(tick);
+    else el.textContent = target.toFixed(decimals) + suffix;
+  }
+  requestAnimationFrame(tick);
 }
 
 async function refreshTimeline() {

@@ -9,22 +9,25 @@
 <link rel="stylesheet" href="/dashboard/static/style.css">
 <link rel="stylesheet" href="/dashboard/static/playground.css">
 <link rel="stylesheet" href="/dashboard/static/voice.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body class="voice-page">
 
 <header class="topbar">
   <div class="brand">
-    <span class="brand-pulse"></span>
-    <span class="brand-name">ARCA <strong>SENTRY</strong></span>
-    <span class="brand-sub">Voice Channel Audit · speak to the bot, watch SENTRY listen</span>
+    <div class="brand-logo"><span class="brand-logo-letter">S</span></div>
+    <div class="brand-text">
+      <div class="brand-name">ARCA <strong>SENTRY</strong></div>
+      <div class="brand-sub" data-i18n="brand.sub.voice">Voice Channel Audit</div>
+    </div>
   </div>
   <nav class="tabs">
-    <a href="/dashboard/" class="tab">Dashboard</a>
-    <a href="/dashboard/playground.html" class="tab">Playground</a>
-    <a href="/dashboard/voice.html" class="tab active">Voice</a>
-    <a href="https://github.com/ealtamirabdi/arca-sentry" target="_blank" class="tab">GitHub →</a>
+    <a href="/dashboard/" class="tab"><i data-lucide="layout-dashboard"></i><span data-i18n="nav.dashboard">Dashboard</span></a>
+    <a href="/dashboard/tickets.html" class="tab"><i data-lucide="ticket"></i><span data-i18n="nav.tickets">Tickets</span></a>
+    <a href="/dashboard/playground.html" class="tab"><i data-lucide="message-square"></i><span data-i18n="nav.playground">Playground</span></a>
+    <a href="/dashboard/voice.html" class="tab active"><i data-lucide="mic"></i><span data-i18n="nav.voice">Voice</span></a>
   </nav>
-  <div class="status-pill"><span class="dot" id="status-dot"></span><span id="status-text">connecting…</span></div>
+  <div class="status-pill"><span class="dot" id="status-dot"></span><span id="status-text" data-i18n="status.connecting">connecting…</span></div>
 </header>
 
 <div class="alert-banner" id="alert-banner">
@@ -40,18 +43,14 @@
 
   <section class="card voice-hero">
     <div class="voice-hero-text">
-      <h2>Speak to a vulnerable voice bot</h2>
-      <p>Push the microphone, ask a question that a real bank's voice agent
-        might mishandle, and watch SENTRY transcribe and audit the call in
-        real time. Spanish, English and Italian all work.</p>
-      <p class="muted small">Uses your browser's microphone via the Web Speech
-        API for transcription, and Speechmatics is configured on the backend
-        for production-grade STT.</p>
+      <h2 data-i18n="voice.hero.title">Speak to a vulnerable voice bot</h2>
+      <p data-i18n="voice.hero.desc1">Push the microphone, ask a question that a real bank's voice agent might mishandle, and watch SENTRY transcribe and audit the call in real time.</p>
+      <p class="muted small" data-i18n="voice.hero.desc2">Uses your browser's microphone via the Web Speech API for transcription, and Speechmatics is configured on the backend for production-grade STT.</p>
     </div>
     <div class="voice-hero-controls">
       <button class="mic-btn" id="mic-btn" aria-label="Push to talk">
         <span class="mic-icon">🎙</span>
-        <span class="mic-label">Hold to talk</span>
+        <span class="mic-label" data-i18n="voice.mic.idle">Hold to talk</span>
         <span class="mic-ring"></span>
       </button>
       <select id="lang-select" class="profile-select voice-lang">
@@ -69,13 +68,13 @@
     <!-- LEFT: live transcript -->
     <div class="card transcript-pane">
       <div class="transcript-head">
-        <h2>Live transcript</h2>
-        <span class="transcript-state" id="transcript-state">tap mic to start</span>
+        <h2 data-i18n="voice.transcript.title">Live transcript</h2>
+        <span class="transcript-state" id="transcript-state" data-i18n="voice.transcript.idle">tap mic to start</span>
       </div>
       <div class="transcript-stream" id="transcript-stream">
         <div class="empty-chat">
-          <p>Hold the microphone button and speak.</p>
-          <p class="muted small">When you stop talking, the bot replies and SENTRY audits the exchange.</p>
+          <p data-i18n="voice.transcript.empty1">Hold the microphone button and speak.</p>
+          <p class="muted small" data-i18n="voice.transcript.empty2">When you stop talking, the bot replies and SENTRY audits the exchange.</p>
         </div>
       </div>
     </div>
@@ -83,8 +82,8 @@
     <!-- RIGHT: SENTRY watching -->
     <div class="card sentry-pane">
       <div class="sentry-head">
-        <h2>SENTRY · voice audit</h2>
-        <span class="sentry-sub" id="sentry-sub">awaiting voice input…</span>
+        <h2 data-i18n="pg.sentry.title">SENTRY · voice audit</h2>
+        <span class="sentry-sub" id="sentry-sub" data-i18n="pg.sentry.awaiting">awaiting voice input…</span>
       </div>
 
       <div class="agent-grid playground-agents" id="playground-agents">
@@ -96,7 +95,7 @@
       </div>
 
       <div class="verdict-box empty" id="verdict-box">
-        <div class="verdict-empty-msg">No interactions audited yet.</div>
+        <div class="verdict-empty-msg" data-i18n="pg.sentry.empty_verdict">No interactions audited yet.</div>
       </div>
 
       <div class="findings-stack" id="findings-stack"></div>
@@ -105,9 +104,8 @@
   </section>
 
   <section class="card voice-suggestions">
-    <h2>Suggested scripts to read aloud</h2>
-    <p class="muted">Try saying any of these — the bot is configured to
-      stumble on each one, giving SENTRY plenty to flag.</p>
+    <h2 data-i18n="voice.suggestions.title">Suggested scripts to read aloud</h2>
+    <p class="muted" data-i18n="voice.suggestions.desc">Try saying any of these — the bot is configured to stumble on each one, giving SENTRY plenty to flag.</p>
     <div class="suggestion-row" id="suggestion-row">
       <div class="suggestion-chip" lang="en"><span class="lang-tag">EN</span> Why was my loan application rejected?</div>
       <div class="suggestion-chip" lang="es"><span class="lang-tag">ES</span> ¿Por qué me rechazaron el crédito?</div>
@@ -120,9 +118,11 @@
 </main>
 
 <footer class="footer">
-  ARCA SENTRY · MIT · <a href="https://github.com/ealtamirabdi/arca-sentry" target="_blank">github.com/ealtamirabdi/arca-sentry</a> · Built by B Drive IT for AI Agent Olympics, Milan 2026
+  ARCA SENTRY · Continuous compliance auditing for enterprise AI
 </footer>
 
 <script src="/dashboard/static/voice.js"></script>
+<script src="/dashboard/static/i18n.js"></script>
+<script>if (window.lucide) window.lucide.createIcons();</script>
 </body>
 </html>
