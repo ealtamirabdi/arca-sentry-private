@@ -151,7 +151,7 @@ def _system_prompt_diff(regulation: str, sample_response: str) -> str:
 
 @router.get("")
 async def list_tickets(
-    status: str | None = Query(None, regex="^(open|in_progress|resolved|dismissed)$"),
+    status: str | None = Query(None, pattern="^(open|in_progress|resolved|dismissed)$"),
     limit: int = Query(50, ge=1, le=500),
 ) -> dict[str, Any]:
     """List tickets — auto-generated from decisions with severity >= warning."""
@@ -317,7 +317,7 @@ async def tickets_summary() -> dict[str, Any]:
 @router.patch("/{interaction_id}/status")
 async def update_status(
     interaction_id: str,
-    status: str = Query(..., regex="^(open|in_progress|resolved|dismissed)$"),
+    status: str = Query(..., pattern="^(open|in_progress|resolved|dismissed)$"),
 ) -> dict[str, Any]:
     """Move a ticket through workflow states. Appends a ticket_status event,
     keeping the audit log immutable while letting workflow state change."""

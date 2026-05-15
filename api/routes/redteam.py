@@ -155,7 +155,7 @@ ATTACKS = [
 
 
 class RedTeamTarget(BaseModel):
-    provider: str = Field(..., regex="^(openai|anthropic|gemini|custom)$")
+    provider: str = Field(..., pattern="^(openai|anthropic|gemini|custom)$")
     api_key: str
     model: str = Field("gpt-4o-mini")
     system_prompt: str | None = None

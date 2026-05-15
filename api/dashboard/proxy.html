@@ -24,11 +24,24 @@
   <nav class="tabs">
     <a href="/dashboard/" class="tab"><i data-lucide="layout-dashboard"></i><span data-i18n="nav.dashboard">Dashboard</span></a>
     <a href="/dashboard/tickets.html" class="tab"><i data-lucide="ticket"></i><span data-i18n="nav.tickets">Tickets</span></a>
-    <a href="/dashboard/playground.html" class="tab"><i data-lucide="message-square"></i><span data-i18n="nav.playground">Playground</span></a>
-    <a href="/dashboard/voice.html" class="tab"><i data-lucide="mic"></i><span data-i18n="nav.voice">Voice</span></a>
-    <a href="/dashboard/proxy.html" class="tab active"><i data-lucide="plug"></i><span data-i18n="nav.proxy">Proxy</span></a>
-    <a href="/dashboard/redteam.html" class="tab"><i data-lucide="target"></i><span data-i18n="nav.redteam">Red Team</span></a>
-    <a href="/dashboard/autofix.html" class="tab"><i data-lucide="wand"></i><span data-i18n="nav.autofix">Auto-Fix</span></a>
+
+    <div class="tab-group " tabindex="0">
+      <span class="tab"><i data-lucide="flask-conical"></i><span data-i18n="nav.test">Test</span><span class="caret">▾</span></span>
+      <div class="tab-menu">
+        <a href="/dashboard/playground.html" class="tab"><i data-lucide="message-square"></i><span data-i18n="nav.playground">Playground</span></a>
+        <a href="/dashboard/voice.html" class="tab"><i data-lucide="mic"></i><span data-i18n="nav.voice">Voice</span></a>
+        <a href="/dashboard/redteam.html" class="tab"><i data-lucide="target"></i><span data-i18n="nav.redteam">Red Team</span></a>
+      </div>
+    </div>
+
+    <div class="tab-group has-active" tabindex="0">
+      <span class="tab"><i data-lucide="plug"></i><span data-i18n="nav.integrate">Integrate</span><span class="caret">▾</span></span>
+      <div class="tab-menu">
+        <a href="/dashboard/proxy.html" class="tab active"><i data-lucide="plug"></i><span data-i18n="nav.proxy">Proxy</span></a>
+        <a href="/dashboard/autofix.html" class="tab"><i data-lucide="wand"></i><span data-i18n="nav.autofix">Auto-Fix</span></a>
+      </div>
+    </div>
+
     <a href="/dashboard/architecture.html" class="tab"><i data-lucide="layers"></i><span data-i18n="nav.architecture">Architecture</span></a>
   </nav>
   <div class="topbar-right">
