@@ -18,6 +18,7 @@
       'nav.dashboard': 'Dashboard',
       'nav.playground': 'Playground',
       'nav.voice': 'Voice',
+      'nav.architecture': 'Architecture',
       'nav.github': 'GitHub →',
       'status.connecting': 'connecting…',
       'status.live': 'live',
@@ -126,6 +127,7 @@
       'nav.tickets': 'Tickets',
       'nav.playground': 'Demo',
       'nav.voice': 'Voz',
+      'nav.architecture': 'Arquitectura',
       'nav.github': 'GitHub →',
       'status.connecting': 'conectando…',
       'status.live': 'en vivo',
@@ -225,6 +227,7 @@
       'nav.tickets': 'Tickets',
       'nav.playground': 'Demo',
       'nav.voice': 'Voce',
+      'nav.architecture': 'Architettura',
       'nav.github': 'GitHub →',
       'status.connecting': 'connessione…',
       'status.live': 'dal vivo',
@@ -324,6 +327,7 @@
       'nav.tickets': '工单',
       'nav.playground': '演示',
       'nav.voice': '语音',
+      'nav.architecture': '架构',
       'nav.github': 'GitHub →',
       'status.connecting': '连接中…',
       'status.live': '在线',
@@ -423,6 +427,7 @@
       'nav.tickets': 'Tickets',
       'nav.playground': 'Demo',
       'nav.voice': 'Voz',
+      'nav.architecture': 'Arquitetura',
       'nav.github': 'GitHub →',
       'status.connecting': 'conectando…',
       'status.live': 'ao vivo',
@@ -559,12 +564,10 @@
   }
 
   function inject() {
-    // Inject the language switcher in the topbar if a placeholder exists,
-    // else append it to the .topbar.
-    const slot = document.querySelector('[data-i18n-slot]') || document.querySelector('.topbar');
-    if (!slot) return;
-    if (slot.querySelector('.lang-switch')) return;
+    // Guard: only inject once per page
+    if (document.querySelector('.lang-switch')) return;
 
+    // Build the select element
     const wrap = document.createElement('select');
     wrap.className = 'lang-switch';
     wrap.id = 'lang-switch';
@@ -579,10 +582,23 @@
     wrap.value = currentLang;
     wrap.onchange = (e) => setLang(e.target.value);
 
-    // Insert before .status-pill if it exists, else append
-    const statusPill = slot.querySelector('.status-pill');
-    if (statusPill) {
-      slot.insertBefore(wrap, statusPill);
+    // Preferred slot: .topbar-right (new layout used in dashboard/tickets)
+    const right = document.querySelector('.topbar-right');
+    if (right) {
+      const pill = right.querySelector('.status-pill');
+      if (pill) right.insertBefore(wrap, pill);
+      else right.appendChild(wrap);
+      return;
+    }
+
+    // Fallback: explicit data-i18n-slot, or directly inside .topbar
+    const slot = document.querySelector('[data-i18n-slot]') || document.querySelector('.topbar');
+    if (!slot) return;
+
+    // If .topbar has a direct .status-pill child, place lang switch before it
+    const pill = slot.querySelector(':scope > .status-pill');
+    if (pill) {
+      slot.insertBefore(wrap, pill);
     } else {
       slot.appendChild(wrap);
     }

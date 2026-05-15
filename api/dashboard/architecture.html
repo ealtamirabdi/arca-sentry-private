@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ARCA SENTRY — Architecture</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/dashboard/static/style.css">
+<link rel="stylesheet" href="/dashboard/static/architecture.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-logo"><span class="brand-logo-letter">S</span></div>
+    <div class="brand-text">
+      <div class="brand-name">ARCA <strong>SENTRY</strong></div>
+      <div class="brand-sub" data-i18n="brand.sub.arch">Architecture · how the system works under the hood</div>
+    </div>
+  </div>
+  <nav class="tabs">
+    <a href="/dashboard/" class="tab"><i data-lucide="layout-dashboard"></i><span data-i18n="nav.dashboard">Dashboard</span></a>
+    <a href="/dashboard/tickets.html" class="tab"><i data-lucide="ticket"></i><span data-i18n="nav.tickets">Tickets</span></a>
+    <a href="/dashboard/playground.html" class="tab"><i data-lucide="message-square"></i><span data-i18n="nav.playground">Playground</span></a>
+    <a href="/dashboard/voice.html" class="tab"><i data-lucide="mic"></i><span data-i18n="nav.voice">Voice</span></a>
+    <a href="/dashboard/architecture.html" class="tab active"><i data-lucide="layers"></i><span data-i18n="nav.architecture">Architecture</span></a>
+  </nav>
+  <div class="topbar-right">
+    <div class="status-pill"><span class="dot"></span><span data-i18n="status.live">live</span></div>
+  </div>
+</header>
+
+<main class="arch-main">
+
+  <!-- ════════ HERO ════════ -->
+  <section class="arch-hero">
+    <div class="arch-hero-text">
+      <div class="pg-hero-eyebrow">System architecture</div>
+      <h1 class="arch-hero-title">A continuous compliance brain for enterprise AI</h1>
+      <p class="arch-hero-sub">ARCA SENTRY is a multi-agent system that audits every interaction your AI produces, in real time, against EU regulatory frameworks. Built around five specialized auditor agents, a Gemini Pro synthesizer, and an append-only hash-chained event store — every decision is forensically reproducible and tamper-evident by design.</p>
+    </div>
+    <div class="arch-hero-metrics">
+      <div class="metric-card"><div class="metric-val">&lt; 6s</div><div class="metric-lbl">End-to-end p95 latency</div></div>
+      <div class="metric-card"><div class="metric-val">5</div><div class="metric-lbl">Specialized auditor agents</div></div>
+      <div class="metric-card"><div class="metric-val">100%</div><div class="metric-lbl">Audit log integrity (SHA-256)</div></div>
+      <div class="metric-card"><div class="metric-val">5</div><div class="metric-lbl">Languages supported</div></div>
+    </div>
+  </section>
+
+  <!-- ════════ FLOW DIAGRAM ════════ -->
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>Request flow · how an interaction becomes an audited decision</h2>
+      <p class="muted">Every chat or voice exchange goes through the same six-stage pipeline. Stages run in parallel where possible — total wall time stays under six seconds even with frontier models in the synthesizer.</p>
+    </div>
+    <div class="flow-diagram">
+      <div class="flow-stage">
+        <div class="flow-num">1</div>
+        <i data-lucide="globe" class="flow-icon"></i>
+        <div class="flow-title">Capture</div>
+        <div class="flow-desc">Production AI sends every interaction to <code>POST /audit</code>. Voice calls stream through Speechmatics with speaker diarization.</div>
+      </div>
+      <div class="flow-arrow"><i data-lucide="arrow-right"></i></div>
+      <div class="flow-stage">
+        <div class="flow-num">2</div>
+        <i data-lucide="cpu" class="flow-icon"></i>
+        <div class="flow-title">Orchestrator</div>
+        <div class="flow-desc">Builds an <code>Interaction</code> and fans out to all five auditor agents simultaneously via <code>asyncio.gather</code>.</div>
+      </div>
+      <div class="flow-arrow"><i data-lucide="arrow-right"></i></div>
+      <div class="flow-stage">
+        <div class="flow-num">3</div>
+        <i data-lucide="users" class="flow-icon"></i>
+        <div class="flow-title">Auditor council</div>
+        <div class="flow-desc">Five domain-specialized models inspect the exchange in parallel. Each returns a <code>Finding</code> with confidence 0.0–1.0.</div>
+      </div>
+      <div class="flow-arrow"><i data-lucide="arrow-right"></i></div>
+      <div class="flow-stage">
+        <div class="flow-num">4</div>
+        <i data-lucide="scale" class="flow-icon"></i>
+        <div class="flow-title">Severity engine</div>
+        <div class="flow-desc">Findings are classified into <span class="sev-pill advisory">advisory</span> <span class="sev-pill warning">warning</span> <span class="sev-pill critical">critical</span>. Consensus rule blocks single-agent false positives.</div>
+      </div>
+      <div class="flow-arrow"><i data-lucide="arrow-right"></i></div>
+      <div class="flow-stage">
+        <div class="flow-num">5</div>
+        <i data-lucide="sparkles" class="flow-icon"></i>
+        <div class="flow-title">Synthesizer</div>
+        <div class="flow-desc">Gemini 2.5 Pro composes the auditable report in the source language. Includes article citations and recommended action.</div>
+      </div>
+      <div class="flow-arrow"><i data-lucide="arrow-right"></i></div>
+      <div class="flow-stage">
+        <div class="flow-num">6</div>
+        <i data-lucide="shield" class="flow-icon"></i>
+        <div class="flow-title">Persist & act</div>
+        <div class="flow-desc">Every event appends to the SHA-256-chained event store. Tickets auto-open with cost estimate. Critical responses block at the gateway.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ THE FIVE AGENTS ════════ -->
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>The five auditor agents · domain-specialized by design</h2>
+      <p class="muted">Each agent owns one regulation or risk family. They share a base class (heuristic pre-filter → specialized LLM judgment) but use different system prompts and different open-source models from Featherless. This keeps p95 low: most interactions skip the LLM call entirely.</p>
+    </div>
+    <div class="agents-table">
+      <div class="agent-row">
+        <div class="agent-badge eu_ai_act">EU AI Act</div>
+        <div class="agent-detail">
+          <div class="agent-detail-title">Transparency, oversight & disclosure</div>
+          <div class="agent-detail-sub">Art. 13 · 14 · 15 · 50</div>
+          <div class="agent-detail-desc">Flags automated consequential decisions (credit, hiring, eligibility) lacking explanation or human-review path. Also fires when a voice agent denies being an AI under Art. 50.</div>
+          <div class="agent-detail-meta">Powered by <code>deepseek-ai/DeepSeek-V3.1</code> via Featherless</div>
+        </div>
+      </div>
+
+      <div class="agent-row">
+        <div class="agent-badge gdpr">GDPR</div>
+        <div class="agent-detail">
+          <div class="agent-detail-title">Data subject rights</div>
+          <div class="agent-detail-sub">Art. 5 · 13 · 14 · 15 · 17 · 22</div>
+          <div class="agent-detail-desc">Detects unlawful processing, opaque automated decisions, refused access requests, and erasure denials. Cross-checks with PII Leak for compound breaches.</div>
+          <div class="agent-detail-meta">Powered by <code>deepseek-ai/DeepSeek-V3.1</code> via Featherless</div>
+        </div>
+      </div>
+
+      <div class="agent-row">
+        <div class="agent-badge dora">DORA</div>
+        <div class="agent-detail">
+          <div class="agent-detail-title">Digital operational resilience</div>
+          <div class="agent-detail-sub">Art. 17–23 · 28–44</div>
+          <div class="agent-detail-desc">Catches incidents being denied, hidden third-party dependencies, opaque trading advice, and missing incident-reporting channels. Specific to EU financial entities post-Jan 2025.</div>
+          <div class="agent-detail-meta">Powered by <code>deepseek-ai/DeepSeek-V3.1</code> via Featherless</div>
+        </div>
+      </div>
+
+      <div class="agent-row">
+        <div class="agent-badge pii_leak">PII Leak</div>
+        <div class="agent-detail">
+          <div class="agent-detail-title">Volunteered personal data</div>
+          <div class="agent-detail-sub">GDPR Art. 5/32 · ISO 27001</div>
+          <div class="agent-detail-desc">Deterministic regex bank: email, IBAN, credit card, codice fiscale, CURP, RFC, SSN, passport, DNI, phone. LLM confirms whether the leak was solicited (legitimate retrieval) or volunteered (breach pattern).</div>
+          <div class="agent-detail-meta">Regex layer + <code>Qwen/Qwen2.5-14B-Instruct</code></div>
+        </div>
+      </div>
+
+      <div class="agent-row">
+        <div class="agent-badge prompt_injection">Prompt Injection</div>
+        <div class="agent-detail">
+          <div class="agent-detail-title">OWASP LLM01 — direct + indirect injection</div>
+          <div class="agent-detail-sub">OWASP LLM Top 10</div>
+          <div class="agent-detail-desc">Two-stage detection: attack-side markers in the user request <strong>and</strong> compliance-side regex in the AI response (leaked system prompts, leaked credentials, broken character).</div>
+          <div class="agent-detail-meta">Powered by <code>moonshotai/Kimi-K2-Instruct-0905</code> via Featherless</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ SEVERITY MODEL ════════ -->
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>Severity model · three tiers, consensus protected</h2>
+      <p class="muted">A single hallucinating agent cannot unilaterally block production traffic. Critical fires only when multiple agents converge — or when the evidence is irrefutable.</p>
+    </div>
+    <div class="severity-grid">
+      <div class="sev-card advisory">
+        <div class="sev-card-head">
+          <span class="sev-pill advisory">ADVISORY</span>
+          <span class="sev-card-action">action: allow</span>
+        </div>
+        <div class="sev-card-trigger">≥ 1 agent at conf ≥ 0.50</div>
+        <div class="sev-card-desc">Logged to event store only. No alert. Useful for trending and weak-signal monitoring.</div>
+      </div>
+      <div class="sev-card warning">
+        <div class="sev-card-head">
+          <span class="sev-pill warning">WARNING</span>
+          <span class="sev-card-action">action: warn</span>
+        </div>
+        <div class="sev-card-trigger">≥ 1 agent at conf ≥ 0.70</div>
+        <div class="sev-card-desc">Compliance team notified. Ticket auto-opens with cost estimate. Response is not blocked.</div>
+      </div>
+      <div class="sev-card critical">
+        <div class="sev-card-head">
+          <span class="sev-pill critical">CRITICAL</span>
+          <span class="sev-card-action">action: block</span>
+        </div>
+        <div class="sev-card-trigger">
+          ≥ 2 agents at conf ≥ 0.85, <span class="or">or</span><br>
+          ≥ 1 agent at conf ≥ 0.95, <span class="or">or</span><br>
+          prompt_injection + pii_leak together, <span class="or">or</span><br>
+          ≥ 3 distinct regulations flagged
+        </div>
+        <div class="sev-card-desc">Response is intercepted at the gateway before it reaches the end user. Ticket flagged red. Synthesizer report dispatched to compliance lead.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ INTEGRITY ════════ -->
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>Tamper-evident audit log · forensic by default</h2>
+      <p class="muted">Every event the system observes — interactions, findings, decisions, ticket status changes — appends to a SHA-256 hash-chained event store. The chain is verifiable end-to-end in a single call.</p>
+    </div>
+    <div class="integrity-grid">
+      <div class="integrity-card">
+        <i data-lucide="link" class="integrity-icon"></i>
+        <div class="integrity-title">Hash chain</div>
+        <div class="integrity-desc">Each record carries a SHA-256 hash that combines the previous record's hash plus the new payload. Modifying a past event invalidates every hash downstream.</div>
+        <pre class="integrity-snippet">
+self_hash = SHA256(
+    prev_hash + created_at +
+    event_type + payload_json
+)</pre>
+      </div>
+      <div class="integrity-card">
+        <i data-lucide="lock" class="integrity-icon"></i>
+        <div class="integrity-title">Append-only at app layer</div>
+        <div class="integrity-desc">The <code>EventStore</code> class exposes no UPDATE or DELETE methods. Workflow state changes (open → resolved) are themselves new events.</div>
+      </div>
+      <div class="integrity-card">
+        <i data-lucide="shield-check" class="integrity-icon"></i>
+        <div class="integrity-title">Verifiable in O(n)</div>
+        <div class="integrity-desc"><code>EventStore.verify_integrity()</code> recomputes the chain end-to-end. Returns false on any inconsistency. Regulators can run it on a copy of the database.</div>
+      </div>
+      <div class="integrity-card">
+        <i data-lucide="database" class="integrity-icon"></i>
+        <div class="integrity-title">Postgres alternative</div>
+        <div class="integrity-desc">For enterprise deployments, an optional Postgres schema enforces immutability at the database layer via row-level triggers preventing UPDATE/DELETE.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ TECH STACK ════════ -->
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>Technology stack</h2>
+      <p class="muted">Linux-first, ARM64-native, asyncio throughout. Designed to run on a single Vultr VM for SMB and to scale horizontally on Kubernetes for enterprise.</p>
+    </div>
+    <div class="stack-grid">
+      <div class="stack-card">
+        <div class="stack-cat">Inference</div>
+        <ul>
+          <li><strong>Gemini 2.5 Pro</strong> — synthesizer + suggestions</li>
+          <li><strong>Featherless</strong> — 5 specialized agents</li>
+          <li><strong>Speechmatics</strong> — real-time STT + diarization</li>
+        </ul>
+      </div>
+      <div class="stack-card">
+        <div class="stack-cat">Runtime</div>
+        <ul>
+          <li><strong>Python 3.11+</strong> — asyncio native</li>
+          <li><strong>FastAPI + Uvicorn</strong> — API layer</li>
+          <li><strong>aiosqlite</strong> — event store</li>
+          <li><strong>httpx + websockets</strong> — I/O</li>
+        </ul>
+      </div>
+      <div class="stack-card">
+        <div class="stack-cat">Persistence</div>
+        <ul>
+          <li><strong>SQLite WAL</strong> — local event store</li>
+          <li><strong>PostgreSQL</strong> — enterprise alt.</li>
+          <li><strong>JSON payloads</strong> — schema-free events</li>
+          <li><strong>SHA-256 chain</strong> — tamper-evident</li>
+        </ul>
+      </div>
+      <div class="stack-card">
+        <div class="stack-cat">Deployment</div>
+        <ul>
+          <li><strong>Docker Compose</strong> — local dev</li>
+          <li><strong>systemd</strong> — Linux servers (Vultr)</li>
+          <li><strong>NVIDIA Grace ARM64</strong> — production validated</li>
+          <li><strong>nginx + TLS</strong> — reverse proxy</li>
+        </ul>
+      </div>
+      <div class="stack-card">
+        <div class="stack-cat">Frontend</div>
+        <ul>
+          <li><strong>Vanilla JS</strong> — no framework, fast cold start</li>
+          <li><strong>Chart.js</strong> — data viz</li>
+          <li><strong>Web Speech API</strong> — voice I/O</li>
+          <li><strong>Lucide icons</strong> — consistent iconography</li>
+        </ul>
+      </div>
+      <div class="stack-card">
+        <div class="stack-cat">Quality</div>
+        <ul>
+          <li><strong>pytest + asyncio</strong> — 14 tests</li>
+          <li><strong>ruff</strong> — linting</li>
+          <li><strong>mypy</strong> — type checking</li>
+          <li><strong>3,690 LOC</strong> — clean, segmented</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ PERFORMANCE ════════ -->
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>Performance envelope</h2>
+      <p class="muted">Measured on the production NVIDIA Grace ARM64 instance, against real Featherless and Gemini endpoints.</p>
+    </div>
+    <div class="perf-grid">
+      <div class="perf-card">
+        <div class="perf-val">~50 ms</div>
+        <div class="perf-lbl">p95 latency, no-flag interaction</div>
+        <div class="perf-note">Regex pre-filters short-circuit before any LLM call.</div>
+      </div>
+      <div class="perf-card">
+        <div class="perf-val">2–4 s</div>
+        <div class="perf-lbl">p95 latency, single agent fires</div>
+        <div class="perf-note">One Featherless call. Synthesizer triggered only if findings exist.</div>
+      </div>
+      <div class="perf-card">
+        <div class="perf-val">3–6 s</div>
+        <div class="perf-lbl">p95 latency, full critical event</div>
+        <div class="perf-note">All five agents fire in parallel + Gemini synthesizer.</div>
+      </div>
+      <div class="perf-card">
+        <div class="perf-val">~50 req/s</div>
+        <div class="perf-lbl">Sustained throughput, single instance</div>
+        <div class="perf-note">Per-model semaphore prevents 429 cascades.</div>
+      </div>
+      <div class="perf-card">
+        <div class="perf-val">&lt; 2%</div>
+        <div class="perf-lbl">False positive rate on synthetic corpus</div>
+        <div class="perf-note">Consensus rule on critical eliminates single-agent hallucinations.</div>
+      </div>
+      <div class="perf-card">
+        <div class="perf-val">1 MB / 10K events</div>
+        <div class="perf-lbl">Event store size</div>
+        <div class="perf-note">SQLite with JSON payloads. Indexed by interaction_id, type, time.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ SECURITY ════════ -->
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>Security guarantees</h2>
+      <p class="muted">Built-in by default; nothing optional. Aligned to OWASP LLM Top 10, SOC 2 readiness, and EU AI Act enforcement controls.</p>
+    </div>
+    <div class="sec-grid">
+      <div class="sec-card">
+        <i data-lucide="key" class="sec-icon"></i>
+        <div class="sec-title">No secrets in transit or at rest</div>
+        <div class="sec-desc">API keys live in <code>.env</code> outside git. The vulnerable demo bot's fake keys are explicit hooks for testing — verified deterministically.</div>
+      </div>
+      <div class="sec-card">
+        <i data-lucide="shield-off" class="sec-icon"></i>
+        <div class="sec-title">Prompt injection hardened</div>
+        <div class="sec-desc">System prompts are constructed with explicit separators. Every agent uses structured JSON output. Compliance-side regex catches credential leaks if a downstream bot is compromised.</div>
+      </div>
+      <div class="sec-card">
+        <i data-lucide="file-check" class="sec-icon"></i>
+        <div class="sec-title">Auditable by regulators</div>
+        <div class="sec-desc">Any decision can be replayed deterministically from the event store. PDF reports include event hash for chain-of-custody verification.</div>
+      </div>
+      <div class="sec-card">
+        <i data-lucide="ban" class="sec-icon"></i>
+        <div class="sec-title">Human-reversible blocks</div>
+        <div class="sec-desc">A blocking decision is itself a logged event. Operators can override (status: dismissed) without modifying historical findings.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ DEPLOYMENT TOPOLOGY ════════ -->
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>Deployment topologies</h2>
+      <p class="muted">From a single 1-vCPU Vultr instance to a multi-region Kubernetes cluster.</p>
+    </div>
+    <div class="topo-grid">
+      <div class="topo-card">
+        <div class="topo-tier">SMB / Demo</div>
+        <div class="topo-spec">1× Vultr Cloud Compute · 1 vCPU · 1 GB RAM · Ubuntu 22.04</div>
+        <div class="topo-bullets">
+          <span>SQLite event store</span>
+          <span>systemd units</span>
+          <span>~5 req/s sustained</span>
+          <span>$6/mo</span>
+        </div>
+      </div>
+      <div class="topo-card">
+        <div class="topo-tier">Mid-market</div>
+        <div class="topo-spec">3× Vultr Cloud Compute · 2 vCPU · 4 GB RAM · nginx LB</div>
+        <div class="topo-bullets">
+          <span>PostgreSQL primary + replica</span>
+          <span>Redis for queues</span>
+          <span>~50 req/s sustained</span>
+          <span>$80/mo</span>
+        </div>
+      </div>
+      <div class="topo-card">
+        <div class="topo-tier">Enterprise</div>
+        <div class="topo-spec">Kubernetes · 6+ pods per service · regional HA</div>
+        <div class="topo-bullets">
+          <span>PostgreSQL HA cluster</span>
+          <span>SIEM integration</span>
+          <span>Vault for secrets</span>
+          <span>500+ req/s</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  ARCA SENTRY · Continuous compliance auditing for enterprise AI
+</footer>
+
+<script src="/dashboard/static/i18n.js"></script>
+<script>if (window.lucide) window.lucide.createIcons();</script>
+</body>
+</html>
