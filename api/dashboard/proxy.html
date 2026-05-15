@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ARCA SENTRY — Proxy Mode</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/dashboard/static/style.css">
+<link rel="stylesheet" href="/dashboard/static/extras.css">
+<link rel="stylesheet" href="/dashboard/static/polish.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-logo"><span class="brand-logo-letter">S</span></div>
+    <div class="brand-text">
+      <div class="brand-name">ARCA <strong>SENTRY</strong></div>
+      <div class="brand-sub" data-i18n="brand.sub.proxy">Proxy mode · drop-in for OpenAI, Anthropic, Gemini</div>
+    </div>
+  </div>
+  <nav class="tabs">
+    <a href="/dashboard/" class="tab"><i data-lucide="layout-dashboard"></i><span data-i18n="nav.dashboard">Dashboard</span></a>
+    <a href="/dashboard/tickets.html" class="tab"><i data-lucide="ticket"></i><span data-i18n="nav.tickets">Tickets</span></a>
+    <a href="/dashboard/playground.html" class="tab"><i data-lucide="message-square"></i><span data-i18n="nav.playground">Playground</span></a>
+    <a href="/dashboard/voice.html" class="tab"><i data-lucide="mic"></i><span data-i18n="nav.voice">Voice</span></a>
+    <a href="/dashboard/proxy.html" class="tab active"><i data-lucide="plug"></i><span data-i18n="nav.proxy">Proxy</span></a>
+    <a href="/dashboard/redteam.html" class="tab"><i data-lucide="target"></i><span data-i18n="nav.redteam">Red Team</span></a>
+    <a href="/dashboard/autofix.html" class="tab"><i data-lucide="wand"></i><span data-i18n="nav.autofix">Auto-Fix</span></a>
+    <a href="/dashboard/architecture.html" class="tab"><i data-lucide="layers"></i><span data-i18n="nav.architecture">Architecture</span></a>
+  </nav>
+  <div class="topbar-right">
+    <div class="status-pill"><span class="dot"></span><span id="status-text" data-i18n="status.connecting">connecting…</span></div>
+  </div>
+</header>
+
+<main class="arch-main">
+
+  <section class="arch-hero">
+    <div class="arch-hero-text">
+      <div class="pg-hero-eyebrow">Drop-in compatibility</div>
+      <h1 class="arch-hero-title">Connect any AI agent in one line of code</h1>
+      <p class="arch-hero-sub">Point your OpenAI / Anthropic / Gemini client at SENTRY's URL instead of the upstream provider. Every call is audited in flight: critical violations are blocked at the gateway with HTTP 451, warnings pass through with diagnostic headers. Zero code changes beyond the base URL.</p>
+    </div>
+    <div class="arch-hero-metrics">
+      <div class="metric-card"><div class="metric-val" id="proxy-total">0</div><div class="metric-lbl">Requests proxied</div></div>
+      <div class="metric-card"><div class="metric-val">3</div><div class="metric-lbl">Provider APIs supported</div></div>
+      <div class="metric-card"><div class="metric-val">1 line</div><div class="metric-lbl">Code changes required</div></div>
+      <div class="metric-card"><div class="metric-val">HTTP 451</div><div class="metric-lbl">On compliance block</div></div>
+    </div>
+  </section>
+
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>Pick your provider — copy, paste, ship</h2>
+      <p class="muted">Every snippet below works against your existing code. Just change <code>base_url</code> (OpenAI) / SDK URL (Anthropic) / endpoint URL (Gemini).</p>
+    </div>
+
+    <div class="snippet-tabs" id="snippet-tabs">
+      <button class="snippet-tab active" data-pane="openai">OpenAI · Python</button>
+      <button class="snippet-tab" data-pane="openai-node">OpenAI · Node</button>
+      <button class="snippet-tab" data-pane="anthropic">Anthropic · Python</button>
+      <button class="snippet-tab" data-pane="gemini">Gemini · curl</button>
+      <button class="snippet-tab" data-pane="langchain">LangChain</button>
+    </div>
+
+    <div class="snippet-pane active" id="pane-openai">
+<pre><code><span class="hl-com"># Before</span>
+from openai import OpenAI
+client = OpenAI(api_key="sk-...")
+
+<span class="hl-com"># After — only base_url changed</span>
+client = OpenAI(
+    api_key="sk-...",
+    <span class="hl-key">base_url="<span id="proxy-base-1">https://sentry.example.com/v1</span>"</span>,
+)
+
+<span class="hl-com"># The rest of your code stays IDENTICAL</span>
+resp = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": "Why was my loan denied?"}],
+)
+print(resp.choices[0].message.content)
+<span class="hl-com"># SENTRY headers in resp.response (X-Sentry-Severity, X-Sentry-Action, ...)</span></code></pre>
+    </div>
+
+    <div class="snippet-pane" id="pane-openai-node">
+<pre><code><span class="hl-com">// Before</span>
+import OpenAI from "openai";
+const client = new OpenAI({ apiKey: "sk-..." });
+
+<span class="hl-com">// After</span>
+const client = new OpenAI({
+  apiKey: "sk-...",
+  <span class="hl-key">baseURL: "<span id="proxy-base-2">https://sentry.example.com/v1</span>"</span>,
+});
+
+<span class="hl-com">// Same call</span>
+const resp = await client.chat.completions.create({
+  model: "gpt-4o-mini",
+  messages: [{ role: "user", content: "Why was my loan denied?" }],
+});</code></pre>
+    </div>
+
+    <div class="snippet-pane" id="pane-anthropic">
+<pre><code><span class="hl-com"># Before</span>
+import anthropic
+client = anthropic.Anthropic(api_key="sk-ant-...")
+
+<span class="hl-com"># After</span>
+client = anthropic.Anthropic(
+    api_key="sk-ant-...",
+    <span class="hl-key">base_url="<span id="proxy-base-3">https://sentry.example.com</span>"</span>,
+)
+
+<span class="hl-com"># Same call</span>
+msg = client.messages.create(
+    model="claude-3-5-sonnet-latest",
+    max_tokens=400,
+    messages=[{"role": "user", "content": "Why was my loan denied?"}],
+)</code></pre>
+    </div>
+
+    <div class="snippet-pane" id="pane-gemini">
+<pre><code><span class="hl-com"># Just change the endpoint URL</span>
+curl -X POST \
+  "<span class="hl-key"><span id="proxy-base-4">https://sentry.example.com</span>/v1beta/models/gemini-2.5-pro:generateContent?key=$GEMINI_KEY</span>" \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "contents": [{"parts": [{"text": "Why was my loan denied?"}]}]
+  }'</code></pre>
+    </div>
+
+    <div class="snippet-pane" id="pane-langchain">
+<pre><code><span class="hl-com"># LangChain works because it wraps OpenAI SDK</span>
+from langchain_openai import ChatOpenAI
+
+llm = ChatOpenAI(
+    model="gpt-4o-mini",
+    api_key="sk-...",
+    <span class="hl-key">base_url="<span id="proxy-base-5">https://sentry.example.com/v1</span>"</span>,
+)
+
+<span class="hl-com"># All of LangChain — agents, chains, retrievers — now audited by SENTRY</span></code></pre>
+    </div>
+  </section>
+
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>What you get in every response</h2>
+      <p class="muted">Headers added by SENTRY on every proxied response, so your application can react to the verdict programmatically.</p>
+    </div>
+    <table class="headers-table">
+      <tr><th>Header</th><th>Values</th><th>Meaning</th></tr>
+      <tr><td><code>X-Sentry-Severity</code></td><td>advisory · warning · critical</td><td>Verdict from the audit. Critical never reaches here — it returns 451 instead.</td></tr>
+      <tr><td><code>X-Sentry-Action</code></td><td>allow · warn · block</td><td>Action SENTRY took.</td></tr>
+      <tr><td><code>X-Sentry-Interaction-Id</code></td><td>UUID</td><td>Use to look up the full audit record via <code>/reports/{id}.json</code>.</td></tr>
+      <tr><td><code>X-Sentry-Finding-Count</code></td><td>0, 1, 2…</td><td>How many auditors flagged something.</td></tr>
+      <tr><td><code>X-Sentry-Primary-Regulation</code></td><td>eu_ai_act · gdpr · dora · pii_leak · prompt_injection</td><td>Top-priority regulation flagged.</td></tr>
+      <tr><td><code>X-Sentry-Primary-Article</code></td><td>Article number string</td><td>The specific article being violated.</td></tr>
+    </table>
+  </section>
+
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>What happens on a CRITICAL violation</h2>
+      <p class="muted">SENTRY returns HTTP 451 (Unavailable for Legal Reasons) instead of forwarding the upstream response. The body matches the shape your SDK expects, so your existing error-handling path catches it.</p>
+    </div>
+<pre><code>HTTP/1.1 451 Unavailable For Legal Reasons
+X-Sentry-Severity: critical
+X-Sentry-Action: block
+X-Sentry-Primary-Regulation: prompt_injection
+X-Sentry-Primary-Article: Prompt Injection (OWASP LLM01)
+Content-Type: application/json
+
+{
+  "error": {
+    "message": "Response blocked by SENTRY · Prompt Injection · The AI verbatim disclosed both its system prompt and an API key…",
+    "type": "compliance_block",
+    "code": "blocked_by_sentry"
+  }
+}</code></pre>
+  </section>
+
+</main>
+
+<footer class="footer">
+  ARCA SENTRY · Continuous compliance auditing for enterprise AI
+</footer>
+
+<script src="/dashboard/static/proxy.js"></script>
+<script src="/dashboard/static/i18n.js"></script>
+<script>if (window.lucide) window.lucide.createIcons();</script>
+</body>
+</html>

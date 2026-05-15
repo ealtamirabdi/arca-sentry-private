@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ARCA SENTRY — Auto-Fix</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/dashboard/static/style.css">
+<link rel="stylesheet" href="/dashboard/static/extras.css">
+<link rel="stylesheet" href="/dashboard/static/polish.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-logo"><span class="brand-logo-letter">S</span></div>
+    <div class="brand-text">
+      <div class="brand-name">ARCA <strong>SENTRY</strong></div>
+      <div class="brand-sub" data-i18n="brand.sub.autofix">Auto-Fix · rewrites flagged responses inline so the user gets a compliant reply</div>
+    </div>
+  </div>
+  <nav class="tabs">
+    <a href="/dashboard/" class="tab"><i data-lucide="layout-dashboard"></i><span data-i18n="nav.dashboard">Dashboard</span></a>
+    <a href="/dashboard/tickets.html" class="tab"><i data-lucide="ticket"></i><span data-i18n="nav.tickets">Tickets</span></a>
+    <a href="/dashboard/playground.html" class="tab"><i data-lucide="message-square"></i><span data-i18n="nav.playground">Playground</span></a>
+    <a href="/dashboard/voice.html" class="tab"><i data-lucide="mic"></i><span data-i18n="nav.voice">Voice</span></a>
+    <a href="/dashboard/proxy.html" class="tab"><i data-lucide="plug"></i><span data-i18n="nav.proxy">Proxy</span></a>
+    <a href="/dashboard/redteam.html" class="tab"><i data-lucide="target"></i><span data-i18n="nav.redteam">Red Team</span></a>
+    <a href="/dashboard/autofix.html" class="tab active"><i data-lucide="wand"></i><span data-i18n="nav.autofix">Auto-Fix</span></a>
+    <a href="/dashboard/architecture.html" class="tab"><i data-lucide="layers"></i><span data-i18n="nav.architecture">Architecture</span></a>
+  </nav>
+  <div class="topbar-right">
+    <div class="status-pill"><span class="dot"></span><span data-i18n="status.live">live</span></div>
+  </div>
+</header>
+
+<main class="arch-main">
+
+  <section class="arch-hero">
+    <div class="arch-hero-text">
+      <div class="pg-hero-eyebrow">In-line remediation</div>
+      <h1 class="arch-hero-title">Don't block the user — rewrite the response</h1>
+      <p class="arch-hero-sub">When the audit detects a violation, SENTRY can ask Gemini Pro to <strong>rewrite</strong> the response so the end user receives a compliant reply instead of an error. The original AND the rewrite are both stored — your compliance team reviews the diff, not a customer complaint.</p>
+    </div>
+    <div class="arch-hero-metrics">
+      <div class="metric-card"><div class="metric-val" id="af-total">0</div><div class="metric-lbl">Rewrites this session</div></div>
+      <div class="metric-card"><div class="metric-val">Gemini Pro</div><div class="metric-lbl">Rewriting engine</div></div>
+      <div class="metric-card"><div class="metric-val" id="af-mode">OFF</div><div class="metric-lbl">Current mode</div></div>
+      <div class="metric-card"><div class="metric-val">5 lang</div><div class="metric-lbl">Output languages</div></div>
+    </div>
+  </section>
+
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>Configuration</h2>
+      <p class="muted">When enabled, SENTRY rewrites every response flagged at or above the minimum severity. When disabled, behaviour reverts to standard block/warn/allow.</p>
+    </div>
+    <div class="af-toggle-wrap">
+      <label class="af-toggle">
+        <input type="checkbox" id="af-enable">
+        <span class="af-toggle-track"><span class="af-toggle-knob"></span></span>
+        <span class="af-toggle-label">Enable auto-rewrite</span>
+      </label>
+      <label class="af-severity">
+        <span>Trigger when severity ≥</span>
+        <select id="af-severity">
+          <option value="warning">Warning</option>
+          <option value="critical">Critical only</option>
+        </select>
+      </label>
+    </div>
+  </section>
+
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>Try a rewrite</h2>
+      <p class="muted">Paste an offending response and SENTRY rewrites it to be compliant. Powered by Gemini Pro.</p>
+    </div>
+    <div class="af-form">
+      <label>
+        <span>Original bot response</span>
+        <textarea id="af-original" rows="3" placeholder="Your loan application was automatically denied. We cannot provide further details."></textarea>
+      </label>
+      <div class="af-row">
+        <label class="grow">
+          <span>Regulation violated</span>
+          <select id="af-reg">
+            <option value="eu_ai_act">EU AI Act</option>
+            <option value="gdpr">GDPR</option>
+            <option value="dora">DORA</option>
+            <option value="pii_leak">PII Leak</option>
+            <option value="prompt_injection">Prompt Injection</option>
+          </select>
+        </label>
+        <label>
+          <span>Article (optional)</span>
+          <input type="text" id="af-article" placeholder="e.g. Art. 13">
+        </label>
+        <label>
+          <span>Language</span>
+          <select id="af-lang">
+            <option value="">auto</option>
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="it">Italian</option>
+            <option value="pt">Portuguese</option>
+            <option value="zh">Chinese</option>
+          </select>
+        </label>
+      </div>
+      <label>
+        <span>Why it violates (rationale)</span>
+        <textarea id="af-rationale" rows="2" placeholder="The bot refused a credit decision without offering explanation or human review path."></textarea>
+      </label>
+      <button class="rt-run-btn" id="af-run">✨ Rewrite with Gemini Pro</button>
+    </div>
+
+    <div class="af-result" id="af-result" style="display:none;">
+      <div class="af-diff">
+        <div class="af-pane">
+          <div class="af-pane-head">Before (non-compliant)</div>
+          <div class="af-pane-body" id="af-before"></div>
+        </div>
+        <div class="af-pane after">
+          <div class="af-pane-head">After (compliant)</div>
+          <div class="af-pane-body" id="af-after"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>Recent rewrites</h2>
+      <p class="muted">Last 20 rewrites issued. Click any row to expand the before/after diff.</p>
+    </div>
+    <div class="af-history" id="af-history">
+      <div class="muted" style="padding:24px;text-align:center;">No rewrites yet.</div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  ARCA SENTRY · Continuous compliance auditing for enterprise AI
+</footer>
+
+<script src="/dashboard/static/autofix.js"></script>
+<script src="/dashboard/static/i18n.js"></script>
+<script>if (window.lucide) window.lucide.createIcons();</script>
+</body>
+</html>

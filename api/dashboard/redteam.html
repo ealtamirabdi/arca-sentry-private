@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ARCA SENTRY — Red Team</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/dashboard/static/style.css">
+<link rel="stylesheet" href="/dashboard/static/extras.css">
+<link rel="stylesheet" href="/dashboard/static/polish.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-logo"><span class="brand-logo-letter">S</span></div>
+    <div class="brand-text">
+      <div class="brand-name">ARCA <strong>SENTRY</strong></div>
+      <div class="brand-sub" data-i18n="brand.sub.redteam">Red Team · automated pen-testing for AI agents</div>
+    </div>
+  </div>
+  <nav class="tabs">
+    <a href="/dashboard/" class="tab"><i data-lucide="layout-dashboard"></i><span data-i18n="nav.dashboard">Dashboard</span></a>
+    <a href="/dashboard/tickets.html" class="tab"><i data-lucide="ticket"></i><span data-i18n="nav.tickets">Tickets</span></a>
+    <a href="/dashboard/playground.html" class="tab"><i data-lucide="message-square"></i><span data-i18n="nav.playground">Playground</span></a>
+    <a href="/dashboard/voice.html" class="tab"><i data-lucide="mic"></i><span data-i18n="nav.voice">Voice</span></a>
+    <a href="/dashboard/proxy.html" class="tab"><i data-lucide="plug"></i><span data-i18n="nav.proxy">Proxy</span></a>
+    <a href="/dashboard/redteam.html" class="tab active"><i data-lucide="target"></i><span data-i18n="nav.redteam">Red Team</span></a>
+    <a href="/dashboard/autofix.html" class="tab"><i data-lucide="wand"></i><span data-i18n="nav.autofix">Auto-Fix</span></a>
+    <a href="/dashboard/architecture.html" class="tab"><i data-lucide="layers"></i><span data-i18n="nav.architecture">Architecture</span></a>
+  </nav>
+  <div class="topbar-right">
+    <div class="status-pill"><span class="dot"></span><span data-i18n="status.live">live</span></div>
+  </div>
+</header>
+
+<main class="arch-main">
+
+  <section class="arch-hero">
+    <div class="arch-hero-text">
+      <div class="pg-hero-eyebrow">Automated pen-testing</div>
+      <h1 class="arch-hero-title">30 attacks against your agent in under 2 minutes</h1>
+      <p class="arch-hero-sub">Point SENTRY at any OpenAI / Anthropic / Gemini endpoint, hit "run", and we hit it with the OWASP LLM Top 10 attacks, classic jailbreaks (DAN, AIM, grandma), indirect injection, PII fishing, EU AI Act traps, DORA incident denial, and authority impersonation. Returns a resilience score and a list of vulnerable surfaces.</p>
+    </div>
+    <div class="arch-hero-metrics">
+      <div class="metric-card"><div class="metric-val" id="rt-catalog-count">—</div><div class="metric-lbl">Attacks in catalog</div></div>
+      <div class="metric-card"><div class="metric-val">~120 s</div><div class="metric-lbl">Typical run time</div></div>
+      <div class="metric-card"><div class="metric-val">9</div><div class="metric-lbl">Attack categories</div></div>
+      <div class="metric-card"><div class="metric-val">0–100</div><div class="metric-lbl">Resilience score</div></div>
+    </div>
+  </section>
+
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>Target configuration</h2>
+      <p class="muted">Provide credentials for the agent you want to attack. The API key is used only for this run — never stored.</p>
+    </div>
+    <form class="rt-form" id="rt-form">
+      <div class="rt-grid">
+        <label>
+          <span>Provider</span>
+          <select id="rt-provider">
+            <option value="openai">OpenAI</option>
+            <option value="anthropic">Anthropic</option>
+            <option value="gemini">Google Gemini</option>
+          </select>
+        </label>
+        <label>
+          <span>Model</span>
+          <input type="text" id="rt-model" value="gpt-4o-mini" placeholder="e.g. gpt-4o-mini">
+        </label>
+        <label class="full">
+          <span>API key (not stored)</span>
+          <input type="password" id="rt-key" placeholder="sk-…  or  sk-ant-…  or  AIza…" autocomplete="off">
+        </label>
+        <label class="full">
+          <span>System prompt (optional — leave empty to test default)</span>
+          <textarea id="rt-system" rows="3" placeholder="You are a helpful customer-service agent for ACME Bank…"></textarea>
+        </label>
+      </div>
+      <div class="rt-actions">
+        <button type="submit" class="rt-run-btn" id="rt-run">⚡ Run pen test</button>
+        <span class="muted small" id="rt-status">Ready.</span>
+      </div>
+    </form>
+  </section>
+
+  <section class="card arch-card" id="rt-results-card" style="display:none;">
+    <div class="card-head">
+      <h2>Results</h2>
+      <p class="muted" id="rt-summary">—</p>
+    </div>
+    <div class="rt-score-band" id="rt-score-band">
+      <div class="rt-score">
+        <div class="rt-score-val" id="rt-score-val">—</div>
+        <div class="rt-score-lbl">Resilience score</div>
+      </div>
+      <div class="rt-score-breakdown" id="rt-score-breakdown"></div>
+    </div>
+    <div class="rt-results" id="rt-results"></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  ARCA SENTRY · Continuous compliance auditing for enterprise AI
+</footer>
+
+<script src="/dashboard/static/redteam.js"></script>
+<script src="/dashboard/static/i18n.js"></script>
+<script>if (window.lucide) window.lucide.createIcons();</script>
+</body>
+</html>
