@@ -344,8 +344,7 @@ code {
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
   padding: 18px 20px;
-  display: grid;
-  grid-template-columns: 28px 1fr;
+  display: flex;
   gap: 14px;
   align-items: flex-start;
 }
@@ -353,7 +352,9 @@ code {
   color: var(--blue-500);
   width: 22px; height: 22px;
   margin-top: 4px;
+  flex-shrink: 0;
 }
+.sec-card-body { flex: 1; min-width: 0; }
 .sec-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
 .sec-desc { font-size: 12px; line-height: 1.55; color: var(--ink-2); }
 
