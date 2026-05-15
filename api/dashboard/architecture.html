@@ -38,23 +38,23 @@
   <!-- ════════ HERO ════════ -->
   <section class="arch-hero">
     <div class="arch-hero-text">
-      <div class="pg-hero-eyebrow">System architecture</div>
-      <h1 class="arch-hero-title">A continuous compliance brain for enterprise AI</h1>
-      <p class="arch-hero-sub">ARCA SENTRY is a multi-agent system that audits every interaction your AI produces, in real time, against EU regulatory frameworks. Built around five specialized auditor agents, a Gemini Pro synthesizer, and an append-only hash-chained event store — every decision is forensically reproducible and tamper-evident by design.</p>
+      <div class="pg-hero-eyebrow" data-i18n="arch.hero.eyebrow">System architecture</div>
+      <h1 class="arch-hero-title" data-i18n="arch.hero.title">A continuous compliance brain for enterprise AI</h1>
+      <p class="arch-hero-sub" data-i18n="arch.hero.sub">ARCA SENTRY is a multi-agent system that audits every interaction your AI produces, in real time, against EU regulatory frameworks. Built around five specialized auditor agents, a Gemini Pro synthesizer, and an append-only hash-chained event store — every decision is forensically reproducible and tamper-evident by design.</p>
     </div>
     <div class="arch-hero-metrics">
-      <div class="metric-card"><div class="metric-val">&lt; 6s</div><div class="metric-lbl">End-to-end p95 latency</div></div>
-      <div class="metric-card"><div class="metric-val">5</div><div class="metric-lbl">Specialized auditor agents</div></div>
-      <div class="metric-card"><div class="metric-val">100%</div><div class="metric-lbl">Audit log integrity (SHA-256)</div></div>
-      <div class="metric-card"><div class="metric-val">5</div><div class="metric-lbl">Languages supported</div></div>
+      <div class="metric-card"><div class="metric-val">&lt; 6s</div><div class="metric-lbl" data-i18n="arch.metric.latency">End-to-end p95 latency</div></div>
+      <div class="metric-card"><div class="metric-val">5</div><div class="metric-lbl" data-i18n="arch.metric.agents">Specialized auditor agents</div></div>
+      <div class="metric-card"><div class="metric-val">100%</div><div class="metric-lbl" data-i18n="arch.metric.integrity">Audit log integrity (SHA-256)</div></div>
+      <div class="metric-card"><div class="metric-val">5</div><div class="metric-lbl" data-i18n="arch.metric.langs">Languages supported</div></div>
     </div>
   </section>
 
   <!-- ════════ FLOW DIAGRAM ════════ -->
   <section class="card arch-card">
     <div class="card-head">
-      <h2>Request flow · how an interaction becomes an audited decision</h2>
-      <p class="muted">Every chat or voice exchange goes through the same six-stage pipeline. Stages run in parallel where possible — total wall time stays under six seconds even with frontier models in the synthesizer.</p>
+      <h2 data-i18n="arch.flow.title">Request flow · how an interaction becomes an audited decision</h2>
+      <p class="muted" data-i18n="arch.flow.desc">Every chat or voice exchange goes through the same six-stage pipeline. Stages run in parallel where possible — total wall time stays under six seconds even with frontier models in the synthesizer.</p>
     </div>
     <div class="flow-diagram">
       <div class="flow-stage">
@@ -104,8 +104,8 @@
   <!-- ════════ THE FIVE AGENTS ════════ -->
   <section class="card arch-card">
     <div class="card-head">
-      <h2>The five auditor agents · domain-specialized by design</h2>
-      <p class="muted">Each agent owns one regulation or risk family. They share a base class (heuristic pre-filter → specialized LLM judgment) but use different system prompts and different open-source models from Featherless. This keeps p95 low: most interactions skip the LLM call entirely.</p>
+      <h2 data-i18n="arch.agents.title">The five auditor agents · domain-specialized by design</h2>
+      <p class="muted" data-i18n="arch.agents.desc">Each agent owns one regulation or risk family. They share a base class (heuristic pre-filter → specialized LLM judgment) but use different system prompts and different open-source models from Featherless. This keeps p95 low: most interactions skip the LLM call entirely.</p>
     </div>
     <div class="agents-table">
       <div class="agent-row">
@@ -163,8 +163,8 @@
   <!-- ════════ SEVERITY MODEL ════════ -->
   <section class="card arch-card">
     <div class="card-head">
-      <h2>Severity model · three tiers, consensus protected</h2>
-      <p class="muted">A single hallucinating agent cannot unilaterally block production traffic. Critical fires only when multiple agents converge — or when the evidence is irrefutable.</p>
+      <h2 data-i18n="arch.severity.title">Severity model · three tiers, consensus protected</h2>
+      <p class="muted" data-i18n="arch.severity.desc">A single hallucinating agent cannot unilaterally block production traffic. Critical fires only when multiple agents converge — or when the evidence is irrefutable.</p>
     </div>
     <div class="severity-grid">
       <div class="sev-card advisory">
@@ -202,8 +202,8 @@
   <!-- ════════ INTEGRITY ════════ -->
   <section class="card arch-card">
     <div class="card-head">
-      <h2>Tamper-evident audit log · forensic by default</h2>
-      <p class="muted">Every event the system observes — interactions, findings, decisions, ticket status changes — appends to a SHA-256 hash-chained event store. The chain is verifiable end-to-end in a single call.</p>
+      <h2 data-i18n="arch.integrity.title">Tamper-evident audit log · forensic by default</h2>
+      <p class="muted" data-i18n="arch.integrity.desc">Every event the system observes — interactions, findings, decisions, ticket status changes — appends to a SHA-256 hash-chained event store. The chain is verifiable end-to-end in a single call.</p>
     </div>
     <div class="integrity-grid">
       <div class="integrity-card">
@@ -237,8 +237,8 @@ self_hash = SHA256(
   <!-- ════════ TECH STACK ════════ -->
   <section class="card arch-card">
     <div class="card-head">
-      <h2>Technology stack</h2>
-      <p class="muted">Linux-first, ARM64-native, asyncio throughout. Designed to run on a single Vultr VM for SMB and to scale horizontally on Kubernetes for enterprise.</p>
+      <h2 data-i18n="arch.stack.title">Technology stack</h2>
+      <p class="muted" data-i18n="arch.stack.desc">Linux-first, ARM64-native, asyncio throughout. Designed to run on a single Vultr VM for SMB and to scale horizontally on Kubernetes for enterprise.</p>
     </div>
     <div class="stack-grid">
       <div class="stack-card">
@@ -300,8 +300,8 @@ self_hash = SHA256(
   <!-- ════════ PERFORMANCE ════════ -->
   <section class="card arch-card">
     <div class="card-head">
-      <h2>Performance envelope</h2>
-      <p class="muted">Measured on the production NVIDIA Grace ARM64 instance, against real Featherless and Gemini endpoints.</p>
+      <h2 data-i18n="arch.perf.title">Performance envelope</h2>
+      <p class="muted" data-i18n="arch.perf.desc">Measured on the production NVIDIA Grace ARM64 instance, against real Featherless and Gemini endpoints.</p>
     </div>
     <div class="perf-grid">
       <div class="perf-card">
@@ -340,8 +340,8 @@ self_hash = SHA256(
   <!-- ════════ SECURITY ════════ -->
   <section class="card arch-card">
     <div class="card-head">
-      <h2>Security guarantees</h2>
-      <p class="muted">Built-in by default; nothing optional. Aligned to OWASP LLM Top 10, SOC 2 readiness, and EU AI Act enforcement controls.</p>
+      <h2 data-i18n="arch.sec.title">Security guarantees</h2>
+      <p class="muted" data-i18n="arch.sec.desc">Built-in by default; nothing optional. Aligned to OWASP LLM Top 10, SOC 2 readiness, and EU AI Act enforcement controls.</p>
     </div>
     <div class="sec-grid">
       <div class="sec-card">
@@ -370,8 +370,8 @@ self_hash = SHA256(
   <!-- ════════ DEPLOYMENT TOPOLOGY ════════ -->
   <section class="card arch-card">
     <div class="card-head">
-      <h2>Deployment topologies</h2>
-      <p class="muted">From a single 1-vCPU Vultr instance to a multi-region Kubernetes cluster.</p>
+      <h2 data-i18n="arch.topo.title">Deployment topologies</h2>
+      <p class="muted" data-i18n="arch.topo.desc">From a single 1-vCPU Vultr instance to a multi-region Kubernetes cluster.</p>
     </div>
     <div class="topo-grid">
       <div class="topo-card">

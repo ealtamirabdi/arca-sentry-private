@@ -40,24 +40,24 @@
   <!-- Summary KPIs -->
   <section class="kpi-row">
     <div class="kpi kpi-critical">
-      <div class="kpi-label"><i data-lucide="alert-octagon" class="kpi-icon"></i><span>Open tickets</span></div>
+      <div class="kpi-label"><i data-lucide="alert-octagon" class="kpi-icon"></i><span data-i18n="tickets.kpi.open">Open tickets</span></div>
       <div class="kpi-value" id="kpi-open">—</div>
-      <div class="kpi-suffix">awaiting remediation</div>
+      <div class="kpi-suffix" data-i18n="tickets.kpi.open.sub">awaiting remediation</div>
     </div>
     <div class="kpi kpi-warning">
-      <div class="kpi-label"><i data-lucide="wallet" class="kpi-icon"></i><span>Estimated exposure</span></div>
+      <div class="kpi-label"><i data-lucide="wallet" class="kpi-icon"></i><span data-i18n="tickets.kpi.exposure">Estimated exposure</span></div>
       <div class="kpi-value" id="kpi-exposure">—</div>
-      <div class="kpi-suffix">potential fines if not remediated</div>
+      <div class="kpi-suffix" data-i18n="tickets.kpi.exposure.sub">potential fines if not remediated</div>
     </div>
     <div class="kpi kpi-primary">
-      <div class="kpi-label"><i data-lucide="check-circle" class="kpi-icon"></i><span>Resolved</span></div>
+      <div class="kpi-label"><i data-lucide="check-circle" class="kpi-icon"></i><span data-i18n="tickets.kpi.resolved">Resolved</span></div>
       <div class="kpi-value" id="kpi-resolved">—</div>
-      <div class="kpi-suffix">closed out</div>
+      <div class="kpi-suffix" data-i18n="tickets.kpi.resolved.sub">closed out</div>
     </div>
     <div class="kpi kpi-volume">
-      <div class="kpi-label"><i data-lucide="archive" class="kpi-icon"></i><span>Total tickets</span></div>
+      <div class="kpi-label"><i data-lucide="archive" class="kpi-icon"></i><span data-i18n="tickets.kpi.total">Total tickets</span></div>
       <div class="kpi-value" id="kpi-total">—</div>
-      <div class="kpi-suffix">all time</div>
+      <div class="kpi-suffix" data-i18n="tickets.kpi.total.sub">all time</div>
     </div>
   </section>
 
@@ -69,11 +69,11 @@
         <p class="muted" data-i18n="tickets.list.desc">Every warning or critical detected by SENTRY becomes a ticket here, with an estimated cost if left unresolved and a suggested fix.</p>
       </div>
       <div class="feed-filters">
-        <button class="filter-btn active" data-status="">All</button>
-        <button class="filter-btn" data-status="open">Open</button>
-        <button class="filter-btn" data-status="in_progress">In progress</button>
-        <button class="filter-btn" data-status="resolved">Resolved</button>
-        <button class="filter-btn" data-status="dismissed">Dismissed</button>
+        <button class="filter-btn active" data-status="" data-i18n="tickets.filter.all">All</button>
+        <button class="filter-btn" data-status="open" data-i18n="tickets.filter.open">Open</button>
+        <button class="filter-btn" data-status="in_progress" data-i18n="tickets.filter.in_progress">In progress</button>
+        <button class="filter-btn" data-status="resolved" data-i18n="tickets.filter.resolved">Resolved</button>
+        <button class="filter-btn" data-status="dismissed" data-i18n="tickets.filter.dismissed">Dismissed</button>
       </div>
     </div>
     <div id="tickets-list" class="ticket-section">
