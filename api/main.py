@@ -32,7 +32,8 @@ from core.event_store import EventStore
 from core.orchestrator import Orchestrator
 from synthesizer.gemini_client import Synthesizer
 
-from api.routes import alerts, audit, reports, demo, stats, playground, tickets, proxy, redteam, autofix, agents
+from api.routes import alerts, audit, reports, demo, stats, playground, tickets, proxy, redteam, autofix
+from api.routes import agents as agents_route
 
 log = logging.getLogger(__name__)
 
@@ -82,7 +83,7 @@ async def lifespan(app: FastAPI):
     proxy.set_state(state)
     redteam.set_state(state)
     autofix.set_state(state)
-    agents.set_state(state)
+    agents_route.set_state(state)
 
     yield
 
@@ -110,7 +111,7 @@ app.include_router(tickets.router)
 app.include_router(proxy.router)
 app.include_router(redteam.router)
 app.include_router(autofix.router)
-app.include_router(agents.router)
+app.include_router(agents_route.router)
 
 
 @app.get("/health")
