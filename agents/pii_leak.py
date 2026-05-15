@@ -13,8 +13,8 @@ from __future__ import annotations
 import logging
 import re
 
-from agents.base import AuditorAgent, _parse_judgment
 from adapters.featherless import ChatMessage
+from agents.base import AuditorAgent, _parse_judgment
 from core.orchestrator import Interaction
 from core.policies import Finding, Regulation
 

@@ -19,7 +19,6 @@ import re
 from agents.base import AuditorAgent
 from core.policies import Regulation
 
-
 _KEYWORDS = [
     r"\b(?:personal\s+data|datos\s+personales|dati\s+personali)\b",
     r"\b(?:right\s+to|derecho\s+a|diritto\s+di)\b",

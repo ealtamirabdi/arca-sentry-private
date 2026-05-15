@@ -24,7 +24,6 @@ import re
 from agents.base import AuditorAgent
 from core.policies import Regulation
 
-
 _KEYWORDS = [
     r"\b(?:trading|trade|portfolio|invest(?:ment)?|advisor)\b",
     r"\b(?:incident|outage|breach|downtime|disruption)\b",

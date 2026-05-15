@@ -17,7 +17,6 @@ import re
 from agents.base import AuditorAgent
 from core.policies import Regulation
 
-
 _KEYWORDS = [
     r"\b(?:credit|loan|mortgage|underwriting|score|scoring)\b",
     r"\b(?:approve|approval|deny|denied|rejected?)\b",

@@ -20,7 +20,7 @@ def set_state(state) -> None:
 @router.get("")
 async def list_alerts(
     limit: int = Query(50, ge=1, le=500),
-    severity: str | None = Query(None, regex="^(warning|critical)$"),
+    severity: str | None = Query(None, pattern="^(warning|critical)$"),
 ) -> dict[str, Any]:
     if _state is None or _state.event_store is None:
         raise HTTPException(503, "event store not ready")

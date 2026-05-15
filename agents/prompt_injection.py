@@ -20,7 +20,6 @@ import re
 from agents.base import AuditorAgent
 from core.policies import Regulation
 
-
 _KEYWORDS = [
     r"ignore\s+(?:all\s+)?(?:previous|prior|above)\s+(?:instructions?|system\s+prompt)",
     r"(?:disregard|forget|override)\s+(?:your|the)\s+(?:instructions?|guidelines?|rules?)",

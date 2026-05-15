@@ -13,7 +13,6 @@ The orchestrator and event store are constructed once at startup and shared.
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import os
 from contextlib import asynccontextmanager
@@ -28,11 +27,10 @@ from agents.eu_ai_act import EUAIActAgent
 from agents.gdpr import GDPRAgent
 from agents.pii_leak import PIILeakAgent
 from agents.prompt_injection import PromptInjectionAgent
+from api.routes import alerts, audit, demo, reports
 from core.event_store import EventStore
 from core.orchestrator import Orchestrator
 from synthesizer.gemini_client import Synthesizer
-
-from api.routes import alerts, audit, reports, demo
 
 log = logging.getLogger(__name__)
 

@@ -111,6 +111,7 @@ async def capture_interaction(payload: InteractionIn) -> DecisionOut:
 def run() -> None:
     """Entry-point for `sentry-capture-proxy` console script."""
     import asyncio
+
     import uvicorn
 
     from adapters.featherless import FeatherlessClient
