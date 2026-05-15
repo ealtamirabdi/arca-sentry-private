@@ -60,43 +60,43 @@
       <div class="flow-stage">
         <div class="flow-num">1</div>
         <i data-lucide="globe" class="flow-icon"></i>
-        <div class="flow-title">Capture</div>
-        <div class="flow-desc">Production AI sends every interaction to <code>POST /audit</code>. Voice calls stream through Speechmatics with speaker diarization.</div>
+        <div class="flow-title" data-i18n="arch.flow.s1.title">Capture</div>
+        <div class="flow-desc" data-i18n="arch.flow.s1.desc" data-i18n-html>Production AI sends every interaction to <code>POST /audit</code>. Voice calls stream through Speechmatics with speaker diarization.</div>
       </div>
       <div class="flow-arrow"><i data-lucide="arrow-right"></i></div>
       <div class="flow-stage">
         <div class="flow-num">2</div>
         <i data-lucide="cpu" class="flow-icon"></i>
-        <div class="flow-title">Orchestrator</div>
-        <div class="flow-desc">Builds an <code>Interaction</code> and fans out to all five auditor agents simultaneously via <code>asyncio.gather</code>.</div>
+        <div class="flow-title" data-i18n="arch.flow.s2.title">Orchestrator</div>
+        <div class="flow-desc" data-i18n="arch.flow.s2.desc" data-i18n-html>Builds an <code>Interaction</code> and fans out to all five auditor agents simultaneously via <code>asyncio.gather</code>.</div>
       </div>
       <div class="flow-arrow"><i data-lucide="arrow-right"></i></div>
       <div class="flow-stage">
         <div class="flow-num">3</div>
         <i data-lucide="users" class="flow-icon"></i>
-        <div class="flow-title">Auditor council</div>
-        <div class="flow-desc">Five domain-specialized models inspect the exchange in parallel. Each returns a <code>Finding</code> with confidence 0.0–1.0.</div>
+        <div class="flow-title" data-i18n="arch.flow.s3.title">Auditor council</div>
+        <div class="flow-desc" data-i18n="arch.flow.s3.desc" data-i18n-html>Five domain-specialized models inspect the exchange in parallel. Each returns a <code>Finding</code> with confidence 0.0–1.0.</div>
       </div>
       <div class="flow-arrow"><i data-lucide="arrow-right"></i></div>
       <div class="flow-stage">
         <div class="flow-num">4</div>
         <i data-lucide="scale" class="flow-icon"></i>
-        <div class="flow-title">Severity engine</div>
-        <div class="flow-desc">Findings are classified into <span class="sev-pill advisory">advisory</span> <span class="sev-pill warning">warning</span> <span class="sev-pill critical">critical</span>. Consensus rule blocks single-agent false positives.</div>
+        <div class="flow-title" data-i18n="arch.flow.s4.title">Severity engine</div>
+        <div class="flow-desc" data-i18n="arch.flow.s4.desc" data-i18n-html>Findings are classified into <span class="sev-pill advisory">advisory</span> <span class="sev-pill warning">warning</span> <span class="sev-pill critical">critical</span>. Consensus rule blocks single-agent false positives.</div>
       </div>
       <div class="flow-arrow"><i data-lucide="arrow-right"></i></div>
       <div class="flow-stage">
         <div class="flow-num">5</div>
         <i data-lucide="sparkles" class="flow-icon"></i>
-        <div class="flow-title">Synthesizer</div>
-        <div class="flow-desc">Gemini 2.5 Pro composes the auditable report in the source language. Includes article citations and recommended action.</div>
+        <div class="flow-title" data-i18n="arch.flow.s5.title">Synthesizer</div>
+        <div class="flow-desc" data-i18n="arch.flow.s5.desc">Gemini 2.5 Pro composes the auditable report in the source language. Includes article citations and recommended action.</div>
       </div>
       <div class="flow-arrow"><i data-lucide="arrow-right"></i></div>
       <div class="flow-stage">
         <div class="flow-num">6</div>
         <i data-lucide="shield" class="flow-icon"></i>
-        <div class="flow-title">Persist & act</div>
-        <div class="flow-desc">Every event appends to the SHA-256-chained event store. Tickets auto-open with cost estimate. Critical responses block at the gateway.</div>
+        <div class="flow-title" data-i18n="arch.flow.s6.title">Persist & act</div>
+        <div class="flow-desc" data-i18n="arch.flow.s6.desc">Every event appends to the SHA-256-chained event store. Tickets auto-open with cost estimate. Critical responses block at the gateway.</div>
       </div>
     </div>
   </section>
@@ -111,9 +111,9 @@
       <div class="agent-row">
         <div class="agent-badge eu_ai_act">EU AI Act</div>
         <div class="agent-detail">
-          <div class="agent-detail-title">Transparency, oversight & disclosure</div>
+          <div class="agent-detail-title" data-i18n="arch.ag.euaiact.title">Transparency, oversight & disclosure</div>
           <div class="agent-detail-sub">Art. 13 · 14 · 15 · 50</div>
-          <div class="agent-detail-desc">Flags automated consequential decisions (credit, hiring, eligibility) lacking explanation or human-review path. Also fires when a voice agent denies being an AI under Art. 50.</div>
+          <div class="agent-detail-desc" data-i18n="arch.ag.euaiact.desc">Flags automated consequential decisions (credit, hiring, eligibility) lacking explanation or human-review path. Also fires when a voice agent denies being an AI under Art. 50.</div>
           <div class="agent-detail-meta">Powered by <code>deepseek-ai/DeepSeek-V3.1</code> via Featherless</div>
         </div>
       </div>
@@ -121,9 +121,9 @@
       <div class="agent-row">
         <div class="agent-badge gdpr">GDPR</div>
         <div class="agent-detail">
-          <div class="agent-detail-title">Data subject rights</div>
+          <div class="agent-detail-title" data-i18n="arch.ag.gdpr.title">Data subject rights</div>
           <div class="agent-detail-sub">Art. 5 · 13 · 14 · 15 · 17 · 22</div>
-          <div class="agent-detail-desc">Detects unlawful processing, opaque automated decisions, refused access requests, and erasure denials. Cross-checks with PII Leak for compound breaches.</div>
+          <div class="agent-detail-desc" data-i18n="arch.ag.gdpr.desc">Detects unlawful processing, opaque automated decisions, refused access requests, and erasure denials. Cross-checks with PII Leak for compound breaches.</div>
           <div class="agent-detail-meta">Powered by <code>deepseek-ai/DeepSeek-V3.1</code> via Featherless</div>
         </div>
       </div>
@@ -131,9 +131,9 @@
       <div class="agent-row">
         <div class="agent-badge dora">DORA</div>
         <div class="agent-detail">
-          <div class="agent-detail-title">Digital operational resilience</div>
+          <div class="agent-detail-title" data-i18n="arch.ag.dora.title">Digital operational resilience</div>
           <div class="agent-detail-sub">Art. 17–23 · 28–44</div>
-          <div class="agent-detail-desc">Catches incidents being denied, hidden third-party dependencies, opaque trading advice, and missing incident-reporting channels. Specific to EU financial entities post-Jan 2025.</div>
+          <div class="agent-detail-desc" data-i18n="arch.ag.dora.desc">Catches incidents being denied, hidden third-party dependencies, opaque trading advice, and missing incident-reporting channels. Specific to EU financial entities post-Jan 2025.</div>
           <div class="agent-detail-meta">Powered by <code>deepseek-ai/DeepSeek-V3.1</code> via Featherless</div>
         </div>
       </div>
@@ -141,9 +141,9 @@
       <div class="agent-row">
         <div class="agent-badge pii_leak">PII Leak</div>
         <div class="agent-detail">
-          <div class="agent-detail-title">Volunteered personal data</div>
+          <div class="agent-detail-title" data-i18n="arch.ag.pii.title">Volunteered personal data</div>
           <div class="agent-detail-sub">GDPR Art. 5/32 · ISO 27001</div>
-          <div class="agent-detail-desc">Deterministic regex bank: email, IBAN, credit card, codice fiscale, CURP, RFC, SSN, passport, DNI, phone. LLM confirms whether the leak was solicited (legitimate retrieval) or volunteered (breach pattern).</div>
+          <div class="agent-detail-desc" data-i18n="arch.ag.pii.desc">Deterministic regex bank: email, IBAN, credit card, codice fiscale, CURP, RFC, SSN, passport, DNI, phone. LLM confirms whether the leak was solicited (legitimate retrieval) or volunteered (breach pattern).</div>
           <div class="agent-detail-meta">Regex layer + <code>Qwen/Qwen2.5-14B-Instruct</code></div>
         </div>
       </div>
@@ -151,9 +151,9 @@
       <div class="agent-row">
         <div class="agent-badge prompt_injection">Prompt Injection</div>
         <div class="agent-detail">
-          <div class="agent-detail-title">OWASP LLM01 — direct + indirect injection</div>
+          <div class="agent-detail-title" data-i18n="arch.ag.pi.title">OWASP LLM01 — direct + indirect injection</div>
           <div class="agent-detail-sub">OWASP LLM Top 10</div>
-          <div class="agent-detail-desc">Two-stage detection: attack-side markers in the user request <strong>and</strong> compliance-side regex in the AI response (leaked system prompts, leaked credentials, broken character).</div>
+          <div class="agent-detail-desc" data-i18n="arch.ag.pi.desc" data-i18n-html>Two-stage detection: attack-side markers in the user request <strong>and</strong> compliance-side regex in the AI response (leaked system prompts, leaked credentials, broken character).</div>
           <div class="agent-detail-meta">Powered by <code>moonshotai/Kimi-K2-Instruct-0905</code> via Featherless</div>
         </div>
       </div>
@@ -170,23 +170,23 @@
       <div class="sev-card advisory">
         <div class="sev-card-head">
           <span class="sev-pill advisory">ADVISORY</span>
-          <span class="sev-card-action">action: allow</span>
+          <span class="sev-card-action" data-i18n="arch.sev.adv.action">action: allow</span>
         </div>
         <div class="sev-card-trigger">≥ 1 agent at conf ≥ 0.50</div>
-        <div class="sev-card-desc">Logged to event store only. No alert. Useful for trending and weak-signal monitoring.</div>
+        <div class="sev-card-desc" data-i18n="arch.sev.adv.desc">Logged to event store only. No alert. Useful for trending and weak-signal monitoring.</div>
       </div>
       <div class="sev-card warning">
         <div class="sev-card-head">
           <span class="sev-pill warning">WARNING</span>
-          <span class="sev-card-action">action: warn</span>
+          <span class="sev-card-action" data-i18n="arch.sev.warn.action">action: warn</span>
         </div>
         <div class="sev-card-trigger">≥ 1 agent at conf ≥ 0.70</div>
-        <div class="sev-card-desc">Compliance team notified. Ticket auto-opens with cost estimate. Response is not blocked.</div>
+        <div class="sev-card-desc" data-i18n="arch.sev.warn.desc">Compliance team notified. Ticket auto-opens with cost estimate. Response is not blocked.</div>
       </div>
       <div class="sev-card critical">
         <div class="sev-card-head">
           <span class="sev-pill critical">CRITICAL</span>
-          <span class="sev-card-action">action: block</span>
+          <span class="sev-card-action" data-i18n="arch.sev.crit.action">action: block</span>
         </div>
         <div class="sev-card-trigger">
           ≥ 2 agents at conf ≥ 0.85, <span class="or">or</span><br>
@@ -194,7 +194,7 @@
           prompt_injection + pii_leak together, <span class="or">or</span><br>
           ≥ 3 distinct regulations flagged
         </div>
-        <div class="sev-card-desc">Response is intercepted at the gateway before it reaches the end user. Ticket flagged red. Synthesizer report dispatched to compliance lead.</div>
+        <div class="sev-card-desc" data-i18n="arch.sev.crit.desc">Response is intercepted at the gateway before it reaches the end user. Ticket flagged red. Synthesizer report dispatched to compliance lead.</div>
       </div>
     </div>
   </section>
@@ -208,8 +208,8 @@
     <div class="integrity-grid">
       <div class="integrity-card">
         <i data-lucide="link" class="integrity-icon"></i>
-        <div class="integrity-title">Hash chain</div>
-        <div class="integrity-desc">Each record carries a SHA-256 hash that combines the previous record's hash plus the new payload. Modifying a past event invalidates every hash downstream.</div>
+        <div class="integrity-title" data-i18n="arch.int.chain.title">Hash chain</div>
+        <div class="integrity-desc" data-i18n="arch.int.chain.desc">Each record carries a SHA-256 hash that combines the previous record's hash plus the new payload. Modifying a past event invalidates every hash downstream.</div>
         <pre class="integrity-snippet">
 self_hash = SHA256(
     prev_hash + created_at +
@@ -218,18 +218,18 @@ self_hash = SHA256(
       </div>
       <div class="integrity-card">
         <i data-lucide="lock" class="integrity-icon"></i>
-        <div class="integrity-title">Append-only at app layer</div>
-        <div class="integrity-desc">The <code>EventStore</code> class exposes no UPDATE or DELETE methods. Workflow state changes (open → resolved) are themselves new events.</div>
+        <div class="integrity-title" data-i18n="arch.int.append.title">Append-only at app layer</div>
+        <div class="integrity-desc" data-i18n="arch.int.append.desc" data-i18n-html>The <code>EventStore</code> class exposes no UPDATE or DELETE methods. Workflow state changes (open → resolved) are themselves new events.</div>
       </div>
       <div class="integrity-card">
         <i data-lucide="shield-check" class="integrity-icon"></i>
-        <div class="integrity-title">Verifiable in O(n)</div>
-        <div class="integrity-desc"><code>EventStore.verify_integrity()</code> recomputes the chain end-to-end. Returns false on any inconsistency. Regulators can run it on a copy of the database.</div>
+        <div class="integrity-title" data-i18n="arch.int.verify.title">Verifiable in O(n)</div>
+        <div class="integrity-desc" data-i18n="arch.int.verify.desc" data-i18n-html><code>EventStore.verify_integrity()</code> recomputes the chain end-to-end. Returns false on any inconsistency. Regulators can run it on a copy of the database.</div>
       </div>
       <div class="integrity-card">
         <i data-lucide="database" class="integrity-icon"></i>
-        <div class="integrity-title">Postgres alternative</div>
-        <div class="integrity-desc">For enterprise deployments, an optional Postgres schema enforces immutability at the database layer via row-level triggers preventing UPDATE/DELETE.</div>
+        <div class="integrity-title" data-i18n="arch.int.pg.title">Postgres alternative</div>
+        <div class="integrity-desc" data-i18n="arch.int.pg.desc">For enterprise deployments, an optional Postgres schema enforces immutability at the database layer via row-level triggers preventing UPDATE/DELETE.</div>
       </div>
     </div>
   </section>
@@ -242,7 +242,7 @@ self_hash = SHA256(
     </div>
     <div class="stack-grid">
       <div class="stack-card">
-        <div class="stack-cat">Inference</div>
+        <div class="stack-cat" data-i18n="arch.stack.inf">Inference</div>
         <ul>
           <li><strong>Gemini 2.5 Pro</strong> — synthesizer + suggestions</li>
           <li><strong>Featherless</strong> — 5 specialized agents</li>
@@ -250,7 +250,7 @@ self_hash = SHA256(
         </ul>
       </div>
       <div class="stack-card">
-        <div class="stack-cat">Runtime</div>
+        <div class="stack-cat" data-i18n="arch.stack.run">Runtime</div>
         <ul>
           <li><strong>Python 3.11+</strong> — asyncio native</li>
           <li><strong>FastAPI + Uvicorn</strong> — API layer</li>
@@ -259,7 +259,7 @@ self_hash = SHA256(
         </ul>
       </div>
       <div class="stack-card">
-        <div class="stack-cat">Persistence</div>
+        <div class="stack-cat" data-i18n="arch.stack.persist">Persistence</div>
         <ul>
           <li><strong>SQLite WAL</strong> — local event store</li>
           <li><strong>PostgreSQL</strong> — enterprise alt.</li>
@@ -268,7 +268,7 @@ self_hash = SHA256(
         </ul>
       </div>
       <div class="stack-card">
-        <div class="stack-cat">Deployment</div>
+        <div class="stack-cat" data-i18n="arch.stack.deploy">Deployment</div>
         <ul>
           <li><strong>Docker Compose</strong> — local dev</li>
           <li><strong>systemd</strong> — Linux servers (Vultr)</li>
@@ -277,7 +277,7 @@ self_hash = SHA256(
         </ul>
       </div>
       <div class="stack-card">
-        <div class="stack-cat">Frontend</div>
+        <div class="stack-cat" data-i18n="arch.stack.front">Frontend</div>
         <ul>
           <li><strong>Vanilla JS</strong> — no framework, fast cold start</li>
           <li><strong>Chart.js</strong> — data viz</li>
@@ -286,7 +286,7 @@ self_hash = SHA256(
         </ul>
       </div>
       <div class="stack-card">
-        <div class="stack-cat">Quality</div>
+        <div class="stack-cat" data-i18n="arch.stack.qa">Quality</div>
         <ul>
           <li><strong>pytest + asyncio</strong> — 14 tests</li>
           <li><strong>ruff</strong> — linting</li>
@@ -306,33 +306,33 @@ self_hash = SHA256(
     <div class="perf-grid">
       <div class="perf-card">
         <div class="perf-val">~50 ms</div>
-        <div class="perf-lbl">p95 latency, no-flag interaction</div>
-        <div class="perf-note">Regex pre-filters short-circuit before any LLM call.</div>
+        <div class="perf-lbl" data-i18n="arch.perf.p1.lbl">p95 latency, no-flag interaction</div>
+        <div class="perf-note" data-i18n="arch.perf.p1.note">Regex pre-filters short-circuit before any LLM call.</div>
       </div>
       <div class="perf-card">
         <div class="perf-val">2–4 s</div>
-        <div class="perf-lbl">p95 latency, single agent fires</div>
-        <div class="perf-note">One Featherless call. Synthesizer triggered only if findings exist.</div>
+        <div class="perf-lbl" data-i18n="arch.perf.p2.lbl">p95 latency, single agent fires</div>
+        <div class="perf-note" data-i18n="arch.perf.p2.note">One Featherless call. Synthesizer triggered only if findings exist.</div>
       </div>
       <div class="perf-card">
         <div class="perf-val">3–6 s</div>
-        <div class="perf-lbl">p95 latency, full critical event</div>
-        <div class="perf-note">All five agents fire in parallel + Gemini synthesizer.</div>
+        <div class="perf-lbl" data-i18n="arch.perf.p3.lbl">p95 latency, full critical event</div>
+        <div class="perf-note" data-i18n="arch.perf.p3.note">All five agents fire in parallel + Gemini synthesizer.</div>
       </div>
       <div class="perf-card">
         <div class="perf-val">~50 req/s</div>
-        <div class="perf-lbl">Sustained throughput, single instance</div>
-        <div class="perf-note">Per-model semaphore prevents 429 cascades.</div>
+        <div class="perf-lbl" data-i18n="arch.perf.p4.lbl">Sustained throughput, single instance</div>
+        <div class="perf-note" data-i18n="arch.perf.p4.note">Per-model semaphore prevents 429 cascades.</div>
       </div>
       <div class="perf-card">
         <div class="perf-val">&lt; 2%</div>
-        <div class="perf-lbl">False positive rate on synthetic corpus</div>
-        <div class="perf-note">Consensus rule on critical eliminates single-agent hallucinations.</div>
+        <div class="perf-lbl" data-i18n="arch.perf.p5.lbl">False positive rate on synthetic corpus</div>
+        <div class="perf-note" data-i18n="arch.perf.p5.note">Consensus rule on critical eliminates single-agent hallucinations.</div>
       </div>
       <div class="perf-card">
         <div class="perf-val">1 MB / 10K events</div>
-        <div class="perf-lbl">Event store size</div>
-        <div class="perf-note">SQLite with JSON payloads. Indexed by interaction_id, type, time.</div>
+        <div class="perf-lbl" data-i18n="arch.perf.p6.lbl">Event store size</div>
+        <div class="perf-note" data-i18n="arch.perf.p6.note">SQLite with JSON payloads. Indexed by interaction_id, type, time.</div>
       </div>
     </div>
   </section>
@@ -346,23 +346,23 @@ self_hash = SHA256(
     <div class="sec-grid">
       <div class="sec-card">
         <i data-lucide="key" class="sec-icon"></i>
-        <div class="sec-title">No secrets in transit or at rest</div>
-        <div class="sec-desc">API keys live in <code>.env</code> outside git. The vulnerable demo bot's fake keys are explicit hooks for testing — verified deterministically.</div>
+        <div class="sec-title" data-i18n="arch.sec.secrets.title">No secrets in transit or at rest</div>
+        <div class="sec-desc" data-i18n="arch.sec.secrets.desc" data-i18n-html>API keys live in <code>.env</code> outside git. The vulnerable demo bot's fake keys are explicit hooks for testing — verified deterministically.</div>
       </div>
       <div class="sec-card">
         <i data-lucide="shield-off" class="sec-icon"></i>
-        <div class="sec-title">Prompt injection hardened</div>
-        <div class="sec-desc">System prompts are constructed with explicit separators. Every agent uses structured JSON output. Compliance-side regex catches credential leaks if a downstream bot is compromised.</div>
+        <div class="sec-title" data-i18n="arch.sec.injection.title">Prompt injection hardened</div>
+        <div class="sec-desc" data-i18n="arch.sec.injection.desc">System prompts are constructed with explicit separators. Every agent uses structured JSON output. Compliance-side regex catches credential leaks if a downstream bot is compromised.</div>
       </div>
       <div class="sec-card">
         <i data-lucide="file-check" class="sec-icon"></i>
-        <div class="sec-title">Auditable by regulators</div>
-        <div class="sec-desc">Any decision can be replayed deterministically from the event store. PDF reports include event hash for chain-of-custody verification.</div>
+        <div class="sec-title" data-i18n="arch.sec.auditable.title">Auditable by regulators</div>
+        <div class="sec-desc" data-i18n="arch.sec.auditable.desc">Any decision can be replayed deterministically from the event store. PDF reports include event hash for chain-of-custody verification.</div>
       </div>
       <div class="sec-card">
         <i data-lucide="ban" class="sec-icon"></i>
-        <div class="sec-title">Human-reversible blocks</div>
-        <div class="sec-desc">A blocking decision is itself a logged event. Operators can override (status: dismissed) without modifying historical findings.</div>
+        <div class="sec-title" data-i18n="arch.sec.reversible.title">Human-reversible blocks</div>
+        <div class="sec-desc" data-i18n="arch.sec.reversible.desc">A blocking decision is itself a logged event. Operators can override (status: dismissed) without modifying historical findings.</div>
       </div>
     </div>
   </section>
@@ -375,7 +375,7 @@ self_hash = SHA256(
     </div>
     <div class="topo-grid">
       <div class="topo-card">
-        <div class="topo-tier">SMB / Demo</div>
+        <div class="topo-tier" data-i18n="arch.topo.smb.tier">SMB / Demo</div>
         <div class="topo-spec">1× Vultr Cloud Compute · 1 vCPU · 1 GB RAM · Ubuntu 22.04</div>
         <div class="topo-bullets">
           <span>SQLite event store</span>
@@ -385,7 +385,7 @@ self_hash = SHA256(
         </div>
       </div>
       <div class="topo-card">
-        <div class="topo-tier">Mid-market</div>
+        <div class="topo-tier" data-i18n="arch.topo.mid.tier">Mid-market</div>
         <div class="topo-spec">3× Vultr Cloud Compute · 2 vCPU · 4 GB RAM · nginx LB</div>
         <div class="topo-bullets">
           <span>PostgreSQL primary + replica</span>
@@ -395,7 +395,7 @@ self_hash = SHA256(
         </div>
       </div>
       <div class="topo-card">
-        <div class="topo-tier">Enterprise</div>
+        <div class="topo-tier" data-i18n="arch.topo.ent.tier">Enterprise</div>
         <div class="topo-spec">Kubernetes · 6+ pods per service · regional HA</div>
         <div class="topo-bullets">
           <span>PostgreSQL HA cluster</span>
