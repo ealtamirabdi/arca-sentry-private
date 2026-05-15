@@ -1,0 +1,82 @@
+:root {
+  --bg: #fafafa;
+  --bg-elev: #ffffff;
+  --ink: #1a1a1a;
+  --ink-2: #5a5a5a;
+  --line: #e7e2cf;
+  --gold: #c9a227;
+  --gold-d: #8a7029;
+  --gold-bg: #fbf6e6;
+  --green: #2d7a3a;
+  --amber: #c98a00;
+  --red: #b00020;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); color: var(--ink); font-family: 'Inter', -apple-system, sans-serif; font-size: 14px; line-height: 1.5; }
+
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 32px; background: var(--bg-elev); border-bottom: 2px solid var(--gold);
+}
+.brand { display: flex; align-items: baseline; gap: 12px; }
+.brand-mark { color: var(--gold); font-size: 18px; }
+.brand-name { font-size: 22px; letter-spacing: 1px; }
+.brand-name strong { color: var(--gold-d); }
+.brand-sub { color: var(--ink-2); font-size: 12px; }
+.status { font-size: 12px; color: var(--ink-2); }
+.status.live { color: var(--green); }
+.status.live::before { content: "● "; }
+
+main {
+  max-width: 1100px; margin: 24px auto; padding: 0 24px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+}
+main > section { background: var(--bg-elev); border: 1px solid var(--line); border-radius: 8px; padding: 18px 22px; }
+.demo-bar, .verdict-panel, .alerts { grid-column: 1 / -1; }
+
+h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--gold-d); margin-bottom: 10px; }
+.muted { color: var(--ink-2); font-size: 13px; margin-bottom: 10px; }
+
+.scenarios { display: flex; flex-wrap: wrap; gap: 8px; }
+.scenario-btn {
+  font: inherit; background: var(--bg-elev); border: 1px solid var(--gold); color: var(--gold-d);
+  padding: 7px 14px; border-radius: 999px; cursor: pointer; transition: all 0.12s;
+}
+.scenario-btn:hover { background: var(--gold); color: white; }
+.scenario-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.agent-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.agent {
+  border: 1px solid var(--line); border-radius: 6px; padding: 12px;
+  text-align: center; transition: all 0.18s;
+}
+.agent.active { border-color: var(--gold); background: var(--gold-bg); }
+.agent.flagged { border-color: var(--red); background: #fff5f5; }
+.agent-name { font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; }
+.agent-state { font-size: 11px; color: var(--ink-2); margin-top: 4px; }
+
+.verdict { padding: 14px 16px; border-radius: 6px; background: var(--gold-bg); border-left: 4px solid var(--gold); }
+.verdict.empty { color: var(--ink-2); font-style: italic; }
+.verdict.advisory { border-left-color: var(--green); }
+.verdict.warning { border-left-color: var(--amber); }
+.verdict.critical { border-left-color: var(--red); background: #fff5f5; }
+.verdict-header { font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.verdict-header.critical { color: var(--red); }
+.verdict-header.warning { color: var(--amber); }
+.verdict-header.advisory { color: var(--green); }
+
+.findings-list { list-style: none; margin-top: 10px; }
+.findings-list li { padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.findings-list li:last-child { border-bottom: none; }
+.findings-list .agent-tag { display: inline-block; background: var(--gold-bg); color: var(--gold-d); padding: 2px 7px; border-radius: 999px; font-size: 11px; margin-right: 6px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; background: var(--gold); color: white; padding: 8px 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; }
+td { padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:nth-child(even) td { background: var(--gold-bg); }
+.sev { padding: 2px 8px; border-radius: 999px; font-weight: 600; font-size: 11px; text-transform: uppercase; }
+.sev.warning { background: #fff1d0; color: var(--amber); }
+.sev.critical { background: #ffe5ea; color: var(--red); }
+
+footer { text-align: center; color: var(--ink-2); font-size: 11px; padding: 24px 0 40px; }

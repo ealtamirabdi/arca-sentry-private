@@ -1,0 +1,20 @@
+[Unit]
+Description=ARCA SENTRY — HTTP Capture Proxy
+After=arca-sentry-api.service
+Requires=arca-sentry-api.service
+
+[Service]
+Type=simple
+User=@USER@
+WorkingDirectory=@PROJECT_DIR@
+EnvironmentFile=@PROJECT_DIR@/.env
+ExecStart=@PROJECT_DIR@/.venv/bin/python -m capture.api_proxy
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

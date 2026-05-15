@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ARCA SENTRY — Live Compliance Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/dashboard/static/style.css">
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="brand-mark">●</span>
+    <span class="brand-name">ARCA <strong>SENTRY</strong></span>
+    <span class="brand-sub">Compliance audit for enterprise AI · B Drive IT</span>
+  </div>
+  <div class="status" id="status">connecting…</div>
+</header>
+
+<main>
+  <section class="demo-bar">
+    <h2>Run a demo scenario</h2>
+    <p class="muted">Click any scenario below to send a synthetic interaction through
+      the five-agent audit pipeline. Watch the verdict appear in real time.</p>
+    <div class="scenarios" id="scenarios"></div>
+  </section>
+
+  <section class="agents">
+    <h2>Auditor council</h2>
+    <div class="agent-grid" id="agent-grid">
+      <div class="agent" data-name="eu_ai_act_auditor">
+        <div class="agent-name">EU AI Act</div>
+        <div class="agent-state">idle</div>
+      </div>
+      <div class="agent" data-name="gdpr_auditor">
+        <div class="agent-name">GDPR</div>
+        <div class="agent-state">idle</div>
+      </div>
+      <div class="agent" data-name="dora_auditor">
+        <div class="agent-name">DORA</div>
+        <div class="agent-state">idle</div>
+      </div>
+      <div class="agent" data-name="pii_leak_detector">
+        <div class="agent-name">PII Leak</div>
+        <div class="agent-state">idle</div>
+      </div>
+      <div class="agent" data-name="prompt_injection_detector">
+        <div class="agent-name">Prompt Injection</div>
+        <div class="agent-state">idle</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="verdict-panel">
+    <h2>Last verdict</h2>
+    <div id="verdict" class="verdict empty">No interactions audited yet.</div>
+  </section>
+
+  <section class="alerts">
+    <h2>Recent alerts</h2>
+    <table>
+      <thead>
+        <tr><th>Time</th><th>Severity</th><th>Interaction</th><th>Action</th></tr>
+      </thead>
+      <tbody id="alerts-body"></tbody>
+    </table>
+  </section>
+</main>
+
+<footer>
+  ARCA SENTRY v0.1.0 · MIT · Built for AI Agent Olympics Hackathon, Milan 2026
+</footer>
+
+<script src="/dashboard/static/app.js"></script>
+</body>
+</html>

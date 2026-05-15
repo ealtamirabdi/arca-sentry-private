@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: sentry
+      POSTGRES_PASSWORD: sentry
+      POSTGRES_DB: sentry
+    ports:
+      - "5432:5432"
+    volumes:
+      - sentry_pg:/var/lib/postgresql/data
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sentry"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8088
+    environment:
+      - DATABASE_URL=postgresql://sentry:sentry@postgres:5432/sentry
+    env_file: .env
+    ports:
+      - "8088:8088"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./:/app
+    restart: unless-stopped
+
+  orchestrator:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    command: python -m core.orchestrator
+    environment:
+      - DATABASE_URL=postgresql://sentry:sentry@postgres:5432/sentry
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./:/app
+    restart: unless-stopped
+
+  capture-proxy:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    command: python -m capture.api_proxy
+    env_file: .env
+    ports:
+      - "8089:8089"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  sentry_pg:
