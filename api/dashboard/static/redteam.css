@@ -1,0 +1,200 @@
+/* Red Team — agent picker + progress + results */
+
+.rt-agent-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.rt-agent-card {
+  background: var(--bg-elev);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r);
+  padding: 18px 20px;
+  cursor: pointer;
+  transition: all var(--t-base) var(--ease);
+  position: relative;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rt-agent-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--blue-500);
+  border-radius: var(--r) var(--r) 0 0;
+  opacity: 0;
+  transition: opacity var(--t-fast);
+}
+.rt-agent-card:hover {
+  border-color: var(--blue-500);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.rt-agent-card:hover::before { opacity: 1; }
+
+.rt-ag-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.rt-ag-icon {
+  width: 44px; height: 44px;
+  border-radius: var(--r-sm);
+  background: linear-gradient(135deg, var(--blue-50), var(--bg-card));
+  border: 1px solid var(--blue-300);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.rt-ag-info { flex: 1; min-width: 0; }
+.rt-ag-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+  margin-bottom: 2px;
+}
+.rt-ag-vertical {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--blue-700);
+}
+.rt-ag-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--r-full);
+  background: var(--bg-canvas);
+  color: var(--ink-3);
+  border: 1px solid var(--line);
+}
+.rt-ag-status.active {
+  background: var(--green-50);
+  color: var(--green);
+  border-color: var(--green-300);
+}
+.rt-ag-status::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.rt-ag-desc {
+  font-size: 12px;
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+
+.rt-ag-meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.rt-ag-meta-item {
+  text-align: center;
+}
+.rt-ag-meta-item .val {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.rt-ag-meta-item .val.warn { color: var(--amber); }
+.rt-ag-meta-item .val.crit { color: var(--red); }
+.rt-ag-meta-item .lbl {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--ink-3);
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.rt-ag-tags {
+  display: flex; flex-wrap: wrap; gap: 4px;
+}
+.rt-ag-tag {
+  font-size: 9px;
+  background: var(--bg-canvas);
+  color: var(--ink-3);
+  border: 1px solid var(--line);
+  padding: 2px 7px;
+  border-radius: var(--r-full);
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+
+.rt-ag-cta {
+  width: 100%;
+  margin-top: 8px;
+  background: linear-gradient(135deg, var(--red), #7a0014);
+  color: white;
+  border: none;
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--t-fast);
+  box-shadow: var(--shadow-xs);
+}
+.rt-ag-cta:hover { box-shadow: var(--shadow-sm), var(--shadow-glow-red); }
+
+.rt-custom-fold {
+  margin-top: 22px;
+  border-top: 1px dashed var(--line);
+  padding-top: 16px;
+}
+.rt-custom-fold summary {
+  font-size: 12px;
+  color: var(--ink-3);
+  cursor: pointer;
+  font-weight: 600;
+  padding: 6px 0;
+}
+.rt-custom-fold summary:hover { color: var(--blue-700); }
+.rt-custom-fold .rt-form { margin-top: 14px; }
+
+/* Progress bar while running */
+.rt-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-canvas);
+  border-radius: var(--r-full);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  margin: 18px 0 12px;
+}
+.rt-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--blue-500), var(--red));
+  transition: width 0.4s ease-out;
+  border-radius: var(--r-full);
+}
+.rt-progress-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-3);
+  text-align: center;
+}

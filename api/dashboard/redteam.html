@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/dashboard/static/style.css">
 <link rel="stylesheet" href="/dashboard/static/extras.css">
+<link rel="stylesheet" href="/dashboard/static/redteam.css">
 <link rel="stylesheet" href="/dashboard/static/polish.css">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
@@ -34,7 +35,7 @@
       </div>
     </div>
 
-    <div class="tab-group " tabindex="0">
+    <div class="tab-group" tabindex="0">
       <span class="tab"><i data-lucide="plug"></i><span data-i18n="nav.integrate">Integrate</span><span class="caret">▾</span></span>
       <div class="tab-menu">
         <a href="/dashboard/proxy.html" class="tab"><i data-lucide="plug"></i><span data-i18n="nav.proxy">Proxy</span></a>
@@ -54,8 +55,8 @@
   <section class="arch-hero">
     <div class="arch-hero-text">
       <div class="pg-hero-eyebrow">Automated pen-testing</div>
-      <h1 class="arch-hero-title">30 attacks against your agent in under 2 minutes</h1>
-      <p class="arch-hero-sub">Point SENTRY at any OpenAI / Anthropic / Gemini endpoint, hit "run", and we hit it with the OWASP LLM Top 10 attacks, classic jailbreaks (DAN, AIM, grandma), indirect injection, PII fishing, EU AI Act traps, DORA incident denial, and authority impersonation. Returns a resilience score and a list of vulnerable surfaces.</p>
+      <h1 class="arch-hero-title">Pick an agent · launch 30 attacks · get a resilience score</h1>
+      <p class="arch-hero-sub">Click any agent below. SENTRY runs the OWASP LLM Top 10 attacks, classic jailbreaks (DAN, AIM, grandma), indirect injection, PII fishing, EU AI Act traps, DORA incident denial, and authority impersonation against it. Returns a 0–100 resilience score plus the exact prompts that broke through.</p>
     </div>
     <div class="arch-hero-metrics">
       <div class="metric-card"><div class="metric-val" id="rt-catalog-count">—</div><div class="metric-lbl">Attacks in catalog</div></div>
@@ -67,37 +68,52 @@
 
   <section class="card arch-card">
     <div class="card-head">
-      <h2>Target configuration</h2>
-      <p class="muted">Provide credentials for the agent you want to attack. The API key is used only for this run — never stored.</p>
+      <h2>Pick a target agent</h2>
+      <p class="muted">Click any of the agents SENTRY is currently auditing. The pen test runs the full attack suite against the selected agent — no API keys required for the built-in demo agents.</p>
     </div>
-    <form class="rt-form" id="rt-form">
-      <div class="rt-grid">
-        <label>
-          <span>Provider</span>
-          <select id="rt-provider">
-            <option value="openai">OpenAI</option>
-            <option value="anthropic">Anthropic</option>
-            <option value="gemini">Google Gemini</option>
-          </select>
-        </label>
-        <label>
-          <span>Model</span>
-          <input type="text" id="rt-model" value="gpt-4o-mini" placeholder="e.g. gpt-4o-mini">
-        </label>
-        <label class="full">
-          <span>API key (not stored)</span>
-          <input type="password" id="rt-key" placeholder="sk-…  or  sk-ant-…  or  AIza…" autocomplete="off">
-        </label>
-        <label class="full">
-          <span>System prompt (optional — leave empty to test default)</span>
-          <textarea id="rt-system" rows="3" placeholder="You are a helpful customer-service agent for ACME Bank…"></textarea>
-        </label>
-      </div>
-      <div class="rt-actions">
-        <button type="submit" class="rt-run-btn" id="rt-run">⚡ Run pen test</button>
-        <span class="muted small" id="rt-status">Ready.</span>
-      </div>
-    </form>
+    <div class="rt-agent-grid" id="rt-agent-grid">
+      <div class="muted" style="padding:24px;text-align:center;">Loading agents…</div>
+    </div>
+
+    <details class="rt-custom-fold">
+      <summary>⚙ Use a custom external agent instead (advanced)</summary>
+      <form class="rt-form" id="rt-form">
+        <div class="rt-grid">
+          <label>
+            <span>Provider</span>
+            <select id="rt-provider">
+              <option value="openai">OpenAI</option>
+              <option value="anthropic">Anthropic</option>
+              <option value="gemini">Google Gemini</option>
+            </select>
+          </label>
+          <label>
+            <span>Model</span>
+            <input type="text" id="rt-model" value="gpt-4o-mini" placeholder="e.g. gpt-4o-mini">
+          </label>
+          <label class="full">
+            <span>API key (not stored)</span>
+            <input type="password" id="rt-key" placeholder="sk-…  or  sk-ant-…  or  AIza…" autocomplete="off">
+          </label>
+          <label class="full">
+            <span>System prompt (optional)</span>
+            <textarea id="rt-system" rows="2" placeholder="You are a helpful customer-service agent for ACME Bank…"></textarea>
+          </label>
+        </div>
+        <div class="rt-actions">
+          <button type="submit" class="rt-run-btn">⚡ Run pen test on custom agent</button>
+        </div>
+      </form>
+    </details>
+  </section>
+
+  <section class="card arch-card" id="rt-running-card" style="display:none;">
+    <div class="card-head">
+      <h2 id="rt-running-title">Running pen test…</h2>
+      <p class="muted" id="rt-running-sub">Sending attacks against the selected agent. Each takes 1–3 seconds.</p>
+    </div>
+    <div class="rt-progress-bar"><div class="rt-progress-fill" id="rt-progress-fill"></div></div>
+    <div class="rt-progress-label" id="rt-progress-label">Initializing…</div>
   </section>
 
   <section class="card arch-card" id="rt-results-card" style="display:none;">
@@ -105,7 +121,7 @@
       <h2>Results</h2>
       <p class="muted" id="rt-summary">—</p>
     </div>
-    <div class="rt-score-band" id="rt-score-band">
+    <div class="rt-score-band">
       <div class="rt-score">
         <div class="rt-score-val" id="rt-score-val">—</div>
         <div class="rt-score-lbl">Resilience score</div>

@@ -1,20 +1,11 @@
-// ARCA SENTRY — Red Team page logic
+// ARCA SENTRY — Red Team page (agent picker + run + results)
 'use strict';
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => document.querySelectorAll(s);
 
-const MODEL_DEFAULTS = {
-  openai: 'gpt-4o-mini',
-  anthropic: 'claude-3-5-haiku-latest',
-  gemini: 'gemini-2.0-flash',
-};
-
 (async function init() {
-  try {
-    const r = await fetch('/health');
-    if (r.ok) { $('#status-text')?.classList.add('live'); }
-  } catch {}
+  try { const r = await fetch('/health'); if (r.ok) $('.status-pill').classList.add('live'); } catch {}
 
   try {
     const r = await fetch('/redteam/catalog');
@@ -22,57 +13,161 @@ const MODEL_DEFAULTS = {
     $('#rt-catalog-count').textContent = d.total;
   } catch {}
 
-  $('#rt-provider').addEventListener('change', (e) => {
-    $('#rt-model').value = MODEL_DEFAULTS[e.target.value] || '';
-  });
+  await loadAgents();
 
   $('#rt-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    await runPenTest();
+    await runCustom();
   });
 })();
 
-async function runPenTest() {
-  const provider = $('#rt-provider').value;
-  const model = $('#rt-model').value.trim();
-  const key = $('#rt-key').value.trim();
-  const systemPrompt = $('#rt-system').value.trim();
+async function loadAgents() {
+  try {
+    const r = await fetch('/agents');
+    const d = await r.json();
+    const grid = $('#rt-agent-grid');
+    grid.innerHTML = '';
+    d.agents.forEach((a) => grid.appendChild(renderAgentCard(a)));
+    if (window.lucide) window.lucide.createIcons();
+  } catch (e) {
+    $('#rt-agent-grid').innerHTML = '<div class="muted">Could not load agents.</div>';
+  }
+}
 
-  if (!key) { setStatus('❌ API key required', true); return; }
+function renderAgentCard(a) {
+  const card = document.createElement('div');
+  card.className = 'rt-agent-card';
+  const lastTime = a.last_audited_at
+    ? new Date(a.last_audited_at).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })
+    : '—';
+  card.innerHTML = `
+    <div class="rt-ag-head">
+      <div class="rt-ag-icon">${a.icon}</div>
+      <div class="rt-ag-info">
+        <div class="rt-ag-name">${escapeHtml(a.name)}</div>
+        <div class="rt-ag-vertical">${escapeHtml(a.vertical)}</div>
+      </div>
+      <span class="rt-ag-status ${a.status === 'active' ? 'active' : ''}">${a.status}</span>
+    </div>
 
-  $('#rt-run').disabled = true;
-  setStatus('⏳ Running 30 attacks against ' + provider + '/' + model + '…');
-  $('#rt-results-card').style.display = 'block';
-  $('#rt-results').innerHTML = '<div class="muted" style="padding:20px;">Sending attacks… this takes ~1-2 minutes.</div>';
-  $('#rt-score-val').textContent = '—';
-  $('#rt-score-breakdown').innerHTML = '';
-  $('#rt-summary').textContent = '…';
+    <div class="rt-ag-desc">${escapeHtml(a.description)}</div>
+
+    <div class="rt-ag-tags">
+      ${(a.regulations || []).map((r) => `<span class="rt-ag-tag">${escapeHtml(r)}</span>`).join('')}
+    </div>
+
+    <div class="rt-ag-meta">
+      <div class="rt-ag-meta-item">
+        <div class="val">${a.total_audits}</div>
+        <div class="lbl">Audits</div>
+      </div>
+      <div class="rt-ag-meta-item">
+        <div class="val warn">${a.warnings_caught}</div>
+        <div class="lbl">Warnings</div>
+      </div>
+      <div class="rt-ag-meta-item">
+        <div class="val crit">${a.criticals_caught}</div>
+        <div class="lbl">Criticals</div>
+      </div>
+    </div>
+
+    <button class="rt-ag-cta">⚡ Run pen test</button>
+  `;
+  card.querySelector('.rt-ag-cta').onclick = () => runOnAgent(a);
+  return card;
+}
+
+async function runOnAgent(agent) {
+  $('#rt-running-card').style.display = 'block';
+  $('#rt-running-title').textContent = `Pen-testing · ${agent.name}`;
+  $('#rt-running-sub').textContent = `Sending the full attack catalog against ${agent.name}. ${agent.vertical} agent, ${agent.model}.`;
+  $('#rt-results-card').style.display = 'none';
+  animateProgress(0);
+
+  // Smooth progress animation while we wait
+  let prog = 5;
+  const timer = setInterval(() => {
+    prog = Math.min(95, prog + Math.random() * 4);
+    animateProgress(prog);
+    $('#rt-progress-label').textContent =
+      `Running attacks · ${Math.round(prog)}%`;
+  }, 900);
 
   try {
     const r = await fetch('/redteam/run', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        provider, model, api_key: key,
-        system_prompt: systemPrompt || null,
-      }),
+      body: JSON.stringify({ agent_id: agent.id }),
     });
+    clearInterval(timer);
+    animateProgress(100);
+    $('#rt-progress-label').textContent = 'Complete.';
+
     if (!r.ok) {
-      const txt = await r.text();
-      throw new Error(`HTTP ${r.status}: ${txt.slice(0, 200)}`);
+      const t = await r.text();
+      throw new Error(`HTTP ${r.status}: ${t.slice(0, 200)}`);
     }
     const data = await r.json();
-    renderResults(data);
-    setStatus('✓ Done — ' + data.summary.total + ' attacks executed');
+    setTimeout(() => {
+      $('#rt-running-card').style.display = 'none';
+      $('#rt-results-card').style.display = 'block';
+      renderResults(data, agent.name);
+    }, 350);
   } catch (e) {
-    setStatus('❌ ' + e.message, true);
-    $('#rt-results').innerHTML = `<div class="muted" style="padding:20px;color:var(--red);">${escapeHtml(e.message)}</div>`;
-  } finally {
-    $('#rt-run').disabled = false;
+    clearInterval(timer);
+    $('#rt-running-card').style.display = 'none';
+    alert('Pen test failed: ' + e.message);
   }
 }
 
-function renderResults(data) {
+async function runCustom() {
+  const provider = $('#rt-provider').value;
+  const key = $('#rt-key').value.trim();
+  const model = $('#rt-model').value.trim();
+  const systemPrompt = $('#rt-system').value.trim();
+  if (!key) { alert('API key required for custom agent.'); return; }
+
+  $('#rt-running-card').style.display = 'block';
+  $('#rt-running-title').textContent = `Pen-testing · custom ${provider}/${model}`;
+  $('#rt-running-sub').textContent = 'Sending attacks against your external endpoint.';
+  $('#rt-results-card').style.display = 'none';
+  animateProgress(0);
+
+  let prog = 5;
+  const timer = setInterval(() => {
+    prog = Math.min(95, prog + Math.random() * 4);
+    animateProgress(prog);
+    $('#rt-progress-label').textContent = `Running attacks · ${Math.round(prog)}%`;
+  }, 900);
+
+  try {
+    const r = await fetch('/redteam/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ provider, model, api_key: key, system_prompt: systemPrompt || null }),
+    });
+    clearInterval(timer);
+    animateProgress(100);
+    $('#rt-progress-label').textContent = 'Complete.';
+    if (!r.ok) { const t = await r.text(); throw new Error(`HTTP ${r.status}: ${t.slice(0, 200)}`); }
+    const data = await r.json();
+    setTimeout(() => {
+      $('#rt-running-card').style.display = 'none';
+      $('#rt-results-card').style.display = 'block';
+      renderResults(data, `${provider}/${model}`);
+    }, 350);
+  } catch (e) {
+    clearInterval(timer);
+    $('#rt-running-card').style.display = 'none';
+    alert('Pen test failed: ' + e.message);
+  }
+}
+
+function animateProgress(pct) {
+  $('#rt-progress-fill').style.width = pct + '%';
+}
+
+function renderResults(data, targetName) {
   const score = data.summary.resilience_score;
   const v = $('#rt-score-val');
   v.textContent = score + '%';
@@ -85,10 +180,9 @@ function renderResults(data) {
   Object.entries(data.summary.by_category).forEach(([cat, b]) => {
     const item = document.createElement('div');
     item.className = 'rt-breakdown-item';
-    const ratio = b.vulnerable + '/' + b.total;
     item.innerHTML = `
       <span class="cat">${escapeHtml(cat)}</span>
-      <span class="ratio ${b.vulnerable > 0 ? 'fail' : 'ok'}">${ratio}</span>
+      <span class="ratio ${b.vulnerable > 0 ? 'fail' : 'ok'}">${b.vulnerable}/${b.total}</span>
     `;
     breakdown.appendChild(item);
   });
@@ -96,8 +190,8 @@ function renderResults(data) {
   const vul = data.summary.vulnerable;
   const total = data.summary.total;
   $('#rt-summary').textContent =
-    `${vul}/${total} attacks succeeded against this agent. ` +
-    `${score >= 85 ? 'Strong resilience.' : score >= 60 ? 'Several gaps — review red rows below.' : 'Major gaps — urgent remediation needed.'}`;
+    `Target: ${targetName}. ${vul}/${total} attacks succeeded. ` +
+    `${score >= 85 ? 'Strong resilience — minor gaps only.' : score >= 60 ? 'Several gaps — review red rows below.' : 'Major gaps — urgent remediation needed.'}`;
 
   const wrap = $('#rt-results');
   wrap.innerHTML = '';
@@ -107,19 +201,17 @@ function renderResults(data) {
     el.innerHTML = `
       <span class="cat-tag">${escapeHtml(r.category)}</span>
       <span class="name">${escapeHtml(r.name)}<br>
-        <span class="muted" style="font-size:11px;font-family:'JetBrains Mono',monospace;">${escapeHtml(r.response.slice(0, 140))}…</span>
+        <span class="muted" style="font-size:11px;font-family:'JetBrains Mono',monospace;">${escapeHtml((r.response || '').slice(0, 140))}…</span>
       </span>
       <span class="verdict">${r.vulnerable ? '✗ VULNERABLE' : '✓ Resisted'}</span>
     `;
     wrap.appendChild(el);
   });
+
+  // Smooth scroll to results
+  $('#rt-results-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function setStatus(txt, isError) {
-  const el = $('#rt-status');
-  el.textContent = txt;
-  el.style.color = isError ? 'var(--red)' : '';
-}
 function escapeHtml(s) {
   return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }

@@ -155,12 +155,14 @@ ATTACKS = [
 
 
 class RedTeamTarget(BaseModel):
-    provider: str = Field(..., pattern="^(openai|anthropic|gemini|custom)$")
-    api_key: str
+    provider: str | None = Field(None, pattern="^(openai|anthropic|gemini|custom|internal)$")
+    api_key: str | None = None
     model: str = Field("gpt-4o-mini")
     system_prompt: str | None = None
     custom_url: str | None = None  # for provider=custom
     categories: list[str] | None = None  # filter to specific categories
+    agent_id: str | None = None       # NEW — selects from /agents catalog
+    max_attacks: int | None = None    # cap for shorter runs (live demo)
 
 
 class RedTeamResult(BaseModel):
@@ -196,15 +198,36 @@ async def attack_catalog() -> dict[str, Any]:
 @router.post("/run")
 async def run_redteam(target: RedTeamTarget) -> dict[str, Any]:
     """Run the full attack suite against the target. Returns aggregated
-    vulnerability report. Caller can stream progress via /redteam/run-stream
-    instead for long runs.
+    vulnerability report. If `agent_id` is supplied it is resolved against
+    the internal demo catalog; otherwise external provider + api_key are
+    expected.
     """
     if _state is None or _state.orchestrator is None:
         raise HTTPException(503, "system not ready")
 
+    # Resolve agent_id from internal catalog if provided
+    resolved_target = target
+    if target.agent_id:
+        from api.routes.agents import CATALOG
+        agent = next((a for a in CATALOG if a["id"] == target.agent_id), None)
+        if not agent:
+            raise HTTPException(404, f"agent {target.agent_id} not found in catalog")
+        resolved_target = RedTeamTarget(
+            provider="internal",
+            api_key="",
+            model=agent["model"],
+            agent_id=agent["id"],
+            system_prompt=None,
+            categories=target.categories,
+            max_attacks=target.max_attacks,
+        )
+
     filtered = ATTACKS
-    if target.categories:
-        filtered = [a for a in ATTACKS if a["category"] in target.categories]
+    if resolved_target.categories:
+        filtered = [a for a in ATTACKS if a["category"] in resolved_target.categories]
+    if resolved_target.max_attacks:
+        filtered = filtered[: resolved_target.max_attacks]
+    target = resolved_target
 
     results: list[dict[str, Any]] = []
     summary = {"total": 0, "vulnerable": 0, "by_category": {}}
@@ -281,6 +304,11 @@ async def _execute_attack(target: RedTeamTarget, attack: dict[str, Any]) -> dict
 
 async def _call_target(target: RedTeamTarget, prompt: str) -> str:
     """Forward a prompt to the configured target. Returns the bot's reply."""
+    # Internal catalog agent — use SENTRY's own Gemini with the playground
+    # vulnerable system prompt, no external creds needed.
+    if target.provider == "internal" and target.agent_id:
+        return await _call_internal_agent(target.agent_id, prompt)
+
     timeout = httpx.Timeout(45.0)
     sys_prompt = target.system_prompt or "You are a helpful assistant."
 
@@ -353,3 +381,35 @@ async def _call_target(target: RedTeamTarget, prompt: str) -> str:
             return r.text
 
         raise ValueError(f"Unknown provider: {target.provider}")
+
+
+async def _call_internal_agent(agent_id: str, prompt: str) -> str:
+    """Use the playground vulnerable-bot prompts + SENTRY's Gemini client
+    + fallback replies. No external creds. Perfect for live demos."""
+    from api.routes.playground import _BOT_PROMPTS, _fallback_reply
+    from api.routes.agents import CATALOG
+
+    agent = next((a for a in CATALOG if a["id"] == agent_id), None)
+    if not agent:
+        return f"(internal agent {agent_id} not found)"
+
+    profile = agent["playground_profile"]
+    system_prompt = _BOT_PROMPTS.get(profile, _BOT_PROMPTS["banking"])
+
+    try:
+        gemini = _state.synthesizer.gemini
+        resp = await gemini.generate(
+            prompt=prompt,
+            system_instruction=system_prompt,
+            temperature=0.6,
+            max_output_tokens=420,
+            relax_safety=True,
+        )
+        reply = (resp.text or "").strip()
+        if reply:
+            return reply
+    except Exception as exc:
+        log.warning("redteam.internal_failed", extra={"err": str(exc)})
+
+    # Fallback to hand-crafted vulnerable replies when Gemini refuses
+    return _fallback_reply(prompt, profile)
