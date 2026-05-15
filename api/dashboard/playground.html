@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ARCA SENTRY — Live Playground</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/dashboard/static/style.css">
+<link rel="stylesheet" href="/dashboard/static/playground.css">
+</head>
+<body class="playground-page">
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-pulse"></span>
+    <span class="brand-name">ARCA <strong>SENTRY</strong></span>
+    <span class="brand-sub">Live Playground · talk to a vulnerable bot, watch SENTRY audit</span>
+  </div>
+  <nav class="tabs">
+    <a href="/dashboard/" class="tab">Dashboard</a>
+    <a href="/dashboard/playground.html" class="tab active">Playground</a>
+    <a href="/dashboard/voice.html" class="tab">Voice</a>
+    <a href="https://github.com/ealtamirabdi/arca-sentry" target="_blank" class="tab">GitHub →</a>
+  </nav>
+  <div class="status-pill"><span class="dot" id="status-dot"></span><span id="status-text">connecting…</span></div>
+</header>
+
+<!-- Critical alert banner — appears when SENTRY blocks/warns -->
+<div class="alert-banner" id="alert-banner">
+  <div class="alert-icon" id="alert-icon">🚨</div>
+  <div class="alert-text">
+    <div class="alert-title" id="alert-title">VIOLATION DETECTED</div>
+    <div class="alert-detail" id="alert-detail">—</div>
+  </div>
+  <button class="alert-close" id="alert-close">✕</button>
+</div>
+
+<main class="playground-main">
+
+  <!-- ════════ TOP TOOLBAR ════════ -->
+  <section class="playground-toolbar card">
+    <div class="toolbar-left">
+      <label for="profile-select">Bot under audit:</label>
+      <select id="profile-select" class="profile-select">
+        <option value="banking">🏦 ACME Bank (banking)</option>
+        <option value="insurance">🛡️ ACME Insurance</option>
+        <option value="healthcare">🏥 ACME Health</option>
+      </select>
+      <button class="btn-reset" id="btn-reset">↺ Reset conversation</button>
+    </div>
+    <div class="toolbar-hint">
+      The bot is <strong>intentionally vulnerable</strong> for demo purposes.
+      Try the suggested attacks below or type your own.
+    </div>
+  </section>
+
+  <!-- ════════ SUGGESTED ATTACKS ════════ -->
+  <section class="card">
+    <h2>Try one of these</h2>
+    <p class="muted">Click any prompt to send it to the bot and watch SENTRY react.</p>
+    <div class="suggested-grid" id="suggested-grid"></div>
+  </section>
+
+  <!-- ════════ SPLIT CHAT / SENTRY ════════ -->
+  <section class="split">
+
+    <!-- LEFT: chat with vulnerable bot -->
+    <div class="card chat-pane">
+      <div class="chat-head">
+        <h2>Conversation</h2>
+        <span class="chat-actor" id="chat-actor">vulnerable-demo-bot · banking</span>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="empty-chat">
+          <p>Start typing below — or click a suggested attack above.</p>
+          <p class="muted small">Every exchange is audited by SENTRY in real time.</p>
+        </div>
+      </div>
+      <form class="chat-input" id="chat-input-form">
+        <input type="text" id="chat-input" placeholder="Type a message to the bot… (Enter to send)" autocomplete="off">
+        <button type="submit" id="chat-send">Send →</button>
+      </form>
+    </div>
+
+    <!-- RIGHT: SENTRY watching -->
+    <div class="card sentry-pane">
+      <div class="sentry-head">
+        <h2>SENTRY · live audit</h2>
+        <span class="sentry-sub" id="sentry-sub">awaiting interaction…</span>
+      </div>
+
+      <div class="agent-grid playground-agents" id="playground-agents">
+        <div class="agent" data-name="eu_ai_act_auditor"><div class="agent-name">EU AI Act</div><div class="agent-state">idle</div></div>
+        <div class="agent" data-name="gdpr_auditor"><div class="agent-name">GDPR</div><div class="agent-state">idle</div></div>
+        <div class="agent" data-name="dora_auditor"><div class="agent-name">DORA</div><div class="agent-state">idle</div></div>
+        <div class="agent" data-name="pii_leak_detector"><div class="agent-name">PII Leak</div><div class="agent-state">idle</div></div>
+        <div class="agent" data-name="prompt_injection_detector"><div class="agent-name">Prompt Injection</div><div class="agent-state">idle</div></div>
+      </div>
+
+      <div class="verdict-box empty" id="verdict-box">
+        <div class="verdict-empty-msg">No interactions audited yet.</div>
+      </div>
+
+      <div class="findings-stack" id="findings-stack"></div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer class="footer">
+  ARCA SENTRY · MIT · <a href="https://github.com/ealtamirabdi/arca-sentry" target="_blank">github.com/ealtamirabdi/arca-sentry</a> · Built by B Drive IT for AI Agent Olympics, Milan 2026
+</footer>
+
+<script src="/dashboard/static/playground.js"></script>
+</body>
+</html>

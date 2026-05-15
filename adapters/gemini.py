@@ -64,20 +64,43 @@ class GeminiClient:
         system_instruction: str | None = None,
         temperature: float = 0.1,
         max_output_tokens: int = 2048,
+        relax_safety: bool = False,
     ) -> GeminiResponse:
         """Async-friendly wrapper. google-genai is sync under the hood; we run
         it in the default executor so the orchestrator's asyncio loop stays
-        responsive."""
+        responsive.
+
+        `relax_safety=True` lowers all safety thresholds to BLOCK_ONLY_HIGH —
+        used by the playground bot, which must produce vulnerable replies for
+        the audit demo to land.
+        """
         import asyncio
 
         client = self._ensure_client()
 
         def _call() -> Any:
             from google.genai import types
+
+            safety_settings = None
+            if relax_safety:
+                safety_settings = [
+                    types.SafetySetting(
+                        category=cat,
+                        threshold=types.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                    )
+                    for cat in [
+                        types.HarmCategory.HARM_CATEGORY_HARASSMENT,
+                        types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                        types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                        types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                    ]
+                ]
+
             cfg = types.GenerateContentConfig(
                 temperature=temperature,
                 max_output_tokens=max_output_tokens,
                 system_instruction=system_instruction,
+                safety_settings=safety_settings,
             )
             return client.models.generate_content(
                 model=self.model,
@@ -89,10 +112,15 @@ class GeminiClient:
 
         text = getattr(result, "text", "") or ""
         usage = getattr(result, "usage_metadata", None)
+        finish_reason = ""
+        if result.candidates:
+            fr = getattr(result.candidates[0], "finish_reason", None)
+            finish_reason = str(fr) if fr is not None else ""
+
         return GeminiResponse(
             text=text,
             model=self.model,
-            finish_reason=str(getattr(result.candidates[0], "finish_reason", "")) if result.candidates else "",
+            finish_reason=finish_reason,
             tokens_prompt=getattr(usage, "prompt_token_count", 0) if usage else 0,
             tokens_completion=getattr(usage, "candidates_token_count", 0) if usage else 0,
             raw=result,

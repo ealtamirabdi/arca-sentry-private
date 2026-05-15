@@ -2,73 +2,156 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>ARCA SENTRY — Live Compliance Dashboard</title>
+<title>ARCA SENTRY — Compliance Operations Center</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/dashboard/static/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
-<header>
+<header class="topbar">
   <div class="brand">
-    <span class="brand-mark">●</span>
+    <span class="brand-pulse"></span>
     <span class="brand-name">ARCA <strong>SENTRY</strong></span>
-    <span class="brand-sub">Compliance audit for enterprise AI · B Drive IT</span>
+    <span class="brand-sub">Compliance Operations Center</span>
   </div>
-  <div class="status" id="status">connecting…</div>
+  <nav class="tabs">
+    <a href="/dashboard/" class="tab active">Dashboard</a>
+    <a href="/dashboard/playground.html" class="tab">Playground</a>
+    <a href="/dashboard/voice.html" class="tab">Voice</a>
+    <a href="https://github.com/ealtamirabdi/arca-sentry" target="_blank" class="tab">GitHub →</a>
+  </nav>
+  <div class="status-pill">
+    <span class="dot" id="status-dot"></span>
+    <span id="status-text">connecting…</span>
+    <span class="status-meta" id="status-meta"></span>
+  </div>
 </header>
 
 <main>
-  <section class="demo-bar">
-    <h2>Run a demo scenario</h2>
-    <p class="muted">Click any scenario below to send a synthetic interaction through
-      the five-agent audit pipeline. Watch the verdict appear in real time.</p>
+
+  <!-- ════════ KPI ROW ════════ -->
+  <section class="kpi-row">
+    <div class="kpi kpi-primary">
+      <div class="kpi-label">Compliance rate</div>
+      <div class="kpi-value" id="kpi-compliance">—</div>
+      <div class="kpi-suffix">last 24h</div>
+    </div>
+    <div class="kpi kpi-critical">
+      <div class="kpi-label">Critical violations</div>
+      <div class="kpi-value" id="kpi-critical">—</div>
+      <div class="kpi-suffix">blocked at gateway</div>
+    </div>
+    <div class="kpi kpi-warning">
+      <div class="kpi-label">Warnings</div>
+      <div class="kpi-value" id="kpi-warning">—</div>
+      <div class="kpi-suffix">compliance team notified</div>
+    </div>
+    <div class="kpi kpi-volume">
+      <div class="kpi-label">Interactions audited</div>
+      <div class="kpi-value" id="kpi-total">—</div>
+      <div class="kpi-suffix"><span id="kpi-rate">0</span>/min · live</div>
+    </div>
+  </section>
+
+  <!-- ════════ DEMO BAR ════════ -->
+  <section class="card demo-bar">
+    <div class="card-head">
+      <h2>Try it live</h2>
+      <p class="muted">Click a scenario to run a synthetic AI interaction through the full pipeline. Six pre-loaded violations across EU AI Act, GDPR, DORA, PII and prompt injection — in English, Spanish and Italian.</p>
+    </div>
     <div class="scenarios" id="scenarios"></div>
   </section>
 
-  <section class="agents">
-    <h2>Auditor council</h2>
-    <div class="agent-grid" id="agent-grid">
-      <div class="agent" data-name="eu_ai_act_auditor">
-        <div class="agent-name">EU AI Act</div>
-        <div class="agent-state">idle</div>
-      </div>
-      <div class="agent" data-name="gdpr_auditor">
-        <div class="agent-name">GDPR</div>
-        <div class="agent-state">idle</div>
-      </div>
-      <div class="agent" data-name="dora_auditor">
-        <div class="agent-name">DORA</div>
-        <div class="agent-state">idle</div>
-      </div>
-      <div class="agent" data-name="pii_leak_detector">
-        <div class="agent-name">PII Leak</div>
-        <div class="agent-state">idle</div>
-      </div>
-      <div class="agent" data-name="prompt_injection_detector">
-        <div class="agent-name">Prompt Injection</div>
-        <div class="agent-state">idle</div>
+  <!-- ════════ CHARTS ROW ════════ -->
+  <section class="charts-row">
+    <div class="card chart-card">
+      <h2>Compliance overview</h2>
+      <p class="muted">24h breakdown</p>
+      <div class="chart-wrap"><canvas id="chart-donut"></canvas></div>
+    </div>
+    <div class="card chart-card chart-wide">
+      <h2>Violations timeline</h2>
+      <p class="muted">Interactions vs warnings vs criticals, hourly buckets</p>
+      <div class="chart-wrap"><canvas id="chart-timeline"></canvas></div>
+    </div>
+  </section>
+
+  <section class="charts-row">
+    <div class="card chart-card chart-wide">
+      <h2>Top regulations flagged</h2>
+      <p class="muted">Findings by regulation, last 24h</p>
+      <div class="chart-wrap"><canvas id="chart-regulations"></canvas></div>
+    </div>
+    <div class="card chart-card">
+      <h2>Auditor council</h2>
+      <p class="muted">5 specialized agents, current load</p>
+      <div class="agent-grid" id="agent-grid">
+        <div class="agent" data-name="eu_ai_act_auditor"><div class="agent-name">EU AI Act</div><div class="agent-state">idle</div></div>
+        <div class="agent" data-name="gdpr_auditor"><div class="agent-name">GDPR</div><div class="agent-state">idle</div></div>
+        <div class="agent" data-name="dora_auditor"><div class="agent-name">DORA</div><div class="agent-state">idle</div></div>
+        <div class="agent" data-name="pii_leak_detector"><div class="agent-name">PII Leak</div><div class="agent-state">idle</div></div>
+        <div class="agent" data-name="prompt_injection_detector"><div class="agent-name">Prompt Injection</div><div class="agent-state">idle</div></div>
       </div>
     </div>
   </section>
 
-  <section class="verdict-panel">
-    <h2>Last verdict</h2>
-    <div id="verdict" class="verdict empty">No interactions audited yet.</div>
+  <!-- ════════ LIVE FEED ════════ -->
+  <section class="card live-feed">
+    <div class="card-head feed-head">
+      <div>
+        <h2>Live event stream</h2>
+        <p class="muted">Click any row for full forensic detail · auto-refreshes every 3 s</p>
+      </div>
+      <div class="feed-filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="critical">Critical</button>
+        <button class="filter-btn" data-filter="warning">Warning</button>
+        <button class="filter-btn" data-filter="advisory">Advisory</button>
+      </div>
+    </div>
+    <div class="feed-table-wrap">
+      <table class="feed-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Severity</th>
+            <th>Channel</th>
+            <th>Actor</th>
+            <th>Snippet</th>
+            <th>Findings</th>
+            <th>Action</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="feed-body">
+          <tr class="empty-row"><td colspan="8">No events yet — click a demo scenario to start.</td></tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 
-  <section class="alerts">
-    <h2>Recent alerts</h2>
-    <table>
-      <thead>
-        <tr><th>Time</th><th>Severity</th><th>Interaction</th><th>Action</th></tr>
-      </thead>
-      <tbody id="alerts-body"></tbody>
-    </table>
-  </section>
 </main>
 
-<footer>
-  ARCA SENTRY v0.1.0 · MIT · Built for AI Agent Olympics Hackathon, Milan 2026
+<!-- ════════ DETAIL DRAWER ════════ -->
+<div class="drawer-backdrop" id="drawer-backdrop"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div>
+      <div class="drawer-title">Audit detail</div>
+      <div class="drawer-subtitle" id="drawer-iid">—</div>
+    </div>
+    <button class="drawer-close" id="drawer-close">✕</button>
+  </div>
+  <div class="drawer-body" id="drawer-body">
+    <!-- filled dynamically -->
+  </div>
+</aside>
+
+<footer class="footer">
+  ARCA SENTRY · MIT · <a href="https://github.com/ealtamirabdi/arca-sentry" target="_blank">github.com/ealtamirabdi/arca-sentry</a> · Built by B Drive IT for AI Agent Olympics, Milan 2026
 </footer>
 
 <script src="/dashboard/static/app.js"></script>
