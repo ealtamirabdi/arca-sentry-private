@@ -422,7 +422,31 @@
       'tickets.filter.resolved': 'Risolti',
       'tickets.filter.dismissed': 'Respinti',
 
-      // architecture — intentionally left in English (technical docs convention)
+      // architecture
+      'brand.sub.arch': 'Architettura · come funziona il sistema sotto il cofano',
+      'arch.hero.eyebrow': 'Architettura del sistema',
+      'arch.hero.title': 'Un cervello di conformità continua per l\'IA aziendale',
+      'arch.hero.sub': 'ARCA SENTRY è un sistema multi-agente che verifica ogni interazione prodotta dalla tua IA, in tempo reale, contro i quadri normativi UE. Costruito attorno a cinque agenti auditor specializzati, un sintetizzatore Gemini Pro e un event store append-only concatenato con hash — ogni decisione è forensicamente riproducibile e a prova di manomissione per design.',
+      'arch.metric.latency': 'Latenza p95 end-to-end',
+      'arch.metric.agents': 'Agenti auditor specializzati',
+      'arch.metric.integrity': 'Integrità del log (SHA-256)',
+      'arch.metric.langs': 'Lingue supportate',
+      'arch.flow.title': 'Flusso di richiesta · come un\'interazione diventa una decisione auditata',
+      'arch.flow.desc': 'Ogni scambio di chat o voce passa attraverso la stessa pipeline a sei stadi. Gli stadi girano in parallelo dove possibile — il tempo totale rimane sotto i sei secondi anche con modelli di frontiera nel sintetizzatore.',
+      'arch.agents.title': 'I cinque agenti auditor · specializzati per dominio',
+      'arch.agents.desc': 'Ogni agente è padrone di un regolamento o famiglia di rischio. Condividono una classe base (pre-filtro euristico → giudizio LLM specializzato) ma usano system prompt e modelli open-source diversi da Featherless. Questo mantiene il p95 basso: la maggior parte delle interazioni salta del tutto la chiamata LLM.',
+      'arch.severity.title': 'Modello di gravità · tre livelli, protetto dal consenso',
+      'arch.severity.desc': 'Un singolo agente che allucina non può bloccare unilateralmente il traffico produttivo. Critico scatta solo quando più agenti convergono — o quando l\'evidenza è inconfutabile.',
+      'arch.integrity.title': 'Log auditabile a prova di manomissione · forense per design',
+      'arch.integrity.desc': 'Ogni evento osservato dal sistema — interazioni, rilevazioni, decisioni, cambi di stato dei ticket — viene aggiunto a un event store concatenato con SHA-256. La catena è verificabile end-to-end in una singola chiamata.',
+      'arch.stack.title': 'Stack tecnologico',
+      'arch.stack.desc': 'Linux-first, ARM64-nativo, asyncio in tutti i livelli. Progettato per girare su una singola VM Vultr per PMI e scalare orizzontalmente su Kubernetes per le aziende.',
+      'arch.perf.title': 'Profilo di prestazione',
+      'arch.perf.desc': 'Misurato sull\'istanza produttiva NVIDIA Grace ARM64, contro endpoint reali di Featherless e Gemini.',
+      'arch.sec.title': 'Garanzie di sicurezza',
+      'arch.sec.desc': 'Integrate per default; niente di opzionale. Allineate a OWASP LLM Top 10, pronte per SOC 2, e ai controlli di conformità dell\'EU AI Act.',
+      'arch.topo.title': 'Topologie di deployment',
+      'arch.topo.desc': 'Da una singola istanza Vultr con 1 vCPU a un cluster Kubernetes multi-regione.',
     },
 
     zh: {
