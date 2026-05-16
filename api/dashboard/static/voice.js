@@ -19,6 +19,7 @@ const REG_LABELS = {
 let recognition = null;
 let isRecording = false;
 let currentLang = 'en-US';
+let lastInterimText = "";
 let lastFinalText = '';
 let liveTextNode = null;
 
@@ -101,6 +102,9 @@ function setupSpeechRecognition() {
     if (final) {
       lastFinalText = final.trim();
     }
+    if (interim) {
+      lastInterimText = interim.trim();
+    }
   };
 
   recognition.onerror = (e) => {
@@ -125,22 +129,28 @@ function setupSpeechRecognition() {
     $('#mic-btn').classList.remove('recording');
     $('#mic-btn .mic-label').textContent = 'Hold to talk';
 
-    if (liveTextNode && lastFinalText) {
+    // Fallback for Safari/Chrome: if no final transcript arrived but we
+    // captured an interim, treat it as final. Web Speech API in Safari often
+    // never delivers isFinal=true even though the recognition worked fine.
+    const captured = lastFinalText || lastInterimText;
+    if (liveTextNode && captured) {
       liveTextNode.parentElement.classList.remove('partial');
-      liveTextNode.textContent = lastFinalText;
-    } else if (liveTextNode && !lastFinalText) {
-      // No transcript produced — remove the empty partial line
+      liveTextNode.textContent = captured;
+    } else if (liveTextNode && !captured) {
       liveTextNode.parentElement.remove();
     }
 
-    if (!lastFinalText) {
+    if (!captured) {
       setTranscriptState('no speech captured — try again', false);
       return;
     }
+    // Use whichever we got
+    lastFinalText = captured;
 
     setTranscriptState('auditing…', false);
     await processUtterance(lastFinalText);
     lastFinalText = '';
+    lastInterimText = '';
     liveTextNode = null;
     setTranscriptState('tap mic to start', false);
   };
