@@ -84,10 +84,12 @@ function setupSpeechRecognition() {
     $('#mic-btn').classList.add('recording');
     $('#mic-btn .mic-label').textContent = 'Listening — release';
     setTranscriptState('● recording — speak now', true);
-    // No partial line — we append the user line ONCE in onend with the final text.
-    // Live interim updates go to the transcript-state badge so the user sees we're listening.
     lastFinalText = '';
     lastInterimText = '';
+    // Create the orange "partial" bubble on the user side. It mutates as
+    // the recognizer streams interim text. onend either finalises it with
+    // the captured text, or removes it if nothing was captured.
+    appendUserLine('…', true);
   };
 
   recognition.onresult = (event) => {
@@ -101,6 +103,9 @@ function setupSpeechRecognition() {
     if (final) lastFinalText = (lastFinalText + ' ' + final).trim();
     if (interim) lastInterimText = interim.trim();
     const live = (lastFinalText + ' ' + interim).trim();
+    if (liveTextNode && live) {
+      liveTextNode.textContent = live;
+    }
     if (live) setTranscriptState('● ' + live, true);
   };
 
@@ -126,15 +131,20 @@ function setupSpeechRecognition() {
     $('#mic-btn').classList.remove('recording');
     $('#mic-btn .mic-label').textContent = 'Hold to talk';
 
-    // Capture whatever Web Speech delivered. Safari often only emits interim.
     const captured = (lastFinalText || lastInterimText || '').trim();
+    // Finalise (or remove) the orange partial bubble created in onstart.
+    if (liveTextNode) {
+      if (captured) {
+        liveTextNode.parentElement.classList.remove('partial');
+        liveTextNode.textContent = captured;
+      } else {
+        liveTextNode.parentElement.remove();
+      }
+    }
     if (!captured) {
       setTranscriptState('no speech captured — try again', false);
       return;
     }
-    // Append the user line with the final text. Done ONCE — no mutation, no
-    // empty intermediate node, no liveTextNode race condition.
-    appendUserLine(captured, false);
     lastFinalText = captured;
 
     setTranscriptState('auditing…', false);
@@ -251,13 +261,13 @@ function setTranscriptState(text, live) {
 
 /* ───────────────────────── Transcript stream ───────────────────────── */
 
-function appendUserLine(text, _partial) {
+function appendUserLine(text, partial) {
   const stream = $('#transcript-stream');
   const empty = stream.querySelector('.empty-chat');
   if (empty) empty.remove();
 
   const wrap = document.createElement('div');
-  wrap.className = 'transcript-line user';
+  wrap.className = 'transcript-line user' + (partial ? ' partial' : '');
   const meta = document.createElement('div');
   meta.className = 'meta';
   meta.textContent = `user · ${currentLang}`;
@@ -267,6 +277,7 @@ function appendUserLine(text, _partial) {
   wrap.appendChild(body);
   stream.appendChild(wrap);
   stream.scrollTop = stream.scrollHeight;
+  if (partial) liveTextNode = body;
 }
 
 function appendBotLine(text, severity, action) {
