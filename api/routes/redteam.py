@@ -180,6 +180,25 @@ class RedTeamResult(BaseModel):
 # ─────────────────── Endpoints ───────────────────
 
 
+def _balanced_subset(attacks: list[dict[str, Any]], cap: int) -> list[dict[str, Any]]:
+    """Pick `cap` attacks distributing across categories (round-robin), so a
+    fast demo run still touches every attack family rather than 12 jailbreaks
+    in a row."""
+    by_cat: dict[str, list[dict[str, Any]]] = {}
+    for a in attacks:
+        by_cat.setdefault(a["category"], []).append(a)
+    out: list[dict[str, Any]] = []
+    idx = 0
+    while len(out) < cap and any(len(v) > idx for v in by_cat.values()):
+        for items in by_cat.values():
+            if idx < len(items):
+                out.append(items[idx])
+                if len(out) >= cap:
+                    return out
+        idx += 1
+    return out[:cap]
+
+
 @router.get("/catalog")
 async def attack_catalog() -> dict[str, Any]:
     """Return the catalog of attacks. The UI uses this to render the list
@@ -226,24 +245,36 @@ async def run_redteam(target: RedTeamTarget) -> dict[str, Any]:
     if resolved_target.categories:
         filtered = [a for a in ATTACKS if a["category"] in resolved_target.categories]
     if resolved_target.max_attacks:
-        filtered = filtered[: resolved_target.max_attacks]
+        filtered = _balanced_subset(filtered, resolved_target.max_attacks)
     target = resolved_target
 
+    # Execute attacks in batches of 4 in parallel — keeps under tunnel
+    # timeout while still being respectful of upstream rate limits.
+    BATCH_SIZE = 4
     results: list[dict[str, Any]] = []
     summary = {"total": 0, "vulnerable": 0, "by_category": {}}
 
-    for attack in filtered:
-        result = await _execute_attack(target, attack)
-        results.append(result)
-        summary["total"] += 1
-        if result["vulnerable"]:
-            summary["vulnerable"] += 1
-        cat = attack["category"]
-        if cat not in summary["by_category"]:
-            summary["by_category"][cat] = {"total": 0, "vulnerable": 0}
-        summary["by_category"][cat]["total"] += 1
-        if result["vulnerable"]:
-            summary["by_category"][cat]["vulnerable"] += 1
+    for i in range(0, len(filtered), BATCH_SIZE):
+        batch = filtered[i : i + BATCH_SIZE]
+        batch_results = await asyncio.gather(
+            *[_execute_attack(target, a) for a in batch],
+            return_exceptions=True,
+        )
+        for attack, result in zip(batch, batch_results):
+            if isinstance(result, Exception):
+                log.warning("redteam.attack_failed",
+                            extra={"attack": attack["id"], "err": str(result)})
+                continue
+            results.append(result)
+            summary["total"] += 1
+            if result["vulnerable"]:
+                summary["vulnerable"] += 1
+            cat = attack["category"]
+            if cat not in summary["by_category"]:
+                summary["by_category"][cat] = {"total": 0, "vulnerable": 0}
+            summary["by_category"][cat]["total"] += 1
+            if result["vulnerable"]:
+                summary["by_category"][cat]["vulnerable"] += 1
 
     score = round(100 * (1 - summary["vulnerable"] / summary["total"]), 1) if summary["total"] > 0 else 100
     return {

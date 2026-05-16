@@ -97,7 +97,7 @@ async function runOnAgent(agent) {
     const r = await fetch('/redteam/run', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ agent_id: agent.id }),
+      body: JSON.stringify({ agent_id: agent.id, max_attacks: 12 }),
     });
     clearInterval(timer);
     animateProgress(100);
@@ -144,7 +144,7 @@ async function runCustom() {
     const r = await fetch('/redteam/run', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ provider, model, api_key: key, system_prompt: systemPrompt || null }),
+      body: JSON.stringify({ provider, model, api_key: key, system_prompt: systemPrompt || null, max_attacks: 12 }),
     });
     clearInterval(timer);
     animateProgress(100);
