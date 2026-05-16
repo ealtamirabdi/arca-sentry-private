@@ -223,11 +223,29 @@ function renderResults(data, targetName) {
     const el = document.createElement('div');
     el.className = 'rt-result' + (r.vulnerable ? ' vulnerable' : '');
     el.innerHTML = `
-      <span class="cat-tag">${escapeHtml(r.category)}</span>
-      <span class="name">${escapeHtml(r.name)}<br>
-        <span class="muted" style="font-size:11px;font-family:'JetBrains Mono',monospace;">${escapeHtml((r.response || '').slice(0, 140))}…</span>
-      </span>
-      <span class="verdict">${r.vulnerable ? '✗ VULNERABLE' : '✓ Resisted'}</span>
+      <div class="rt-result-head">
+        <span class="cat-tag">${escapeHtml(r.category)}</span>
+        <span class="name">${escapeHtml(r.name)}</span>
+        <span class="verdict">${r.vulnerable ? '✗ VULNERABLE' : '✓ Resisted'}</span>
+      </div>
+      ${r.vulnerable ? `
+        <div class="rt-result-body">
+          <div class="rt-prompt-block">
+            <div class="rt-block-label">🎯 Attacker prompt</div>
+            <code class="rt-prompt-code">${escapeHtml(r.prompt || '')}</code>
+          </div>
+          <div class="rt-response-block">
+            <div class="rt-block-label">💬 Bot response (leaked)</div>
+            <code class="rt-response-code">${escapeHtml((r.response || '').slice(0, 320))}${(r.response || '').length > 320 ? '…' : ''}</code>
+          </div>
+        </div>` : `
+        <div class="rt-result-body">
+          <div class="rt-prompt-block">
+            <div class="rt-block-label muted">Attempted prompt</div>
+            <code class="rt-prompt-code muted">${escapeHtml((r.prompt || '').slice(0, 140))}${(r.prompt || '').length > 140 ? '…' : ''}</code>
+          </div>
+        </div>
+      `}
     `;
     wrap.appendChild(el);
   });
