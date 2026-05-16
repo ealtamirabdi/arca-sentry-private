@@ -132,21 +132,24 @@ function setupSpeechRecognition() {
     $('#mic-btn .mic-label').textContent = 'Hold to talk';
 
     const captured = (lastFinalText || lastInterimText || '').trim();
-    // Finalise (or remove) the orange partial bubble created in onstart.
-    if (liveTextNode) {
-      if (captured) {
-        liveTextNode.parentElement.classList.remove('partial');
-        liveTextNode.textContent = captured;
-      } else {
-        liveTextNode.parentElement.remove();
-      }
+
+    // Always remove the orange partial bubble — it was just visual feedback
+    // while recording. The user's permanent line is appended fresh below.
+    if (liveTextNode && liveTextNode.parentElement) {
+      liveTextNode.parentElement.remove();
     }
+    liveTextNode = null;
+
     if (!captured) {
       setTranscriptState('no speech captured — try again', false);
       return;
     }
-    lastFinalText = captured;
 
+    // Create the FINAL user bubble (solid, blue) with the captured text.
+    // This bubble persists in the chat forever — paired with the bot reply.
+    appendUserLine(captured, false);
+
+    lastFinalText = captured;
     setTranscriptState('auditing…', false);
     await processUtterance(lastFinalText);
     lastFinalText = '';
