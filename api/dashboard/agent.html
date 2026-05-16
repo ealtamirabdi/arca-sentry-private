@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ARCA SENTRY — Agent profile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/dashboard/static/style.css">
+<link rel="stylesheet" href="/dashboard/static/architecture.css">
+<link rel="stylesheet" href="/dashboard/static/extras.css">
+<link rel="stylesheet" href="/dashboard/static/redteam.css">
+<link rel="stylesheet" href="/dashboard/static/polish.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-logo"><span class="brand-logo-letter">S</span></div>
+    <div class="brand-text">
+      <div class="brand-name">ARCA <strong>SENTRY</strong></div>
+      <div class="brand-sub">Agent profile</div>
+    </div>
+  </div>
+  <nav class="tabs">
+    <a href="/dashboard/" class="tab"><i data-lucide="layout-dashboard"></i><span data-i18n="nav.dashboard">Dashboard</span></a>
+    <a href="/dashboard/tickets.html" class="tab"><i data-lucide="ticket"></i><span data-i18n="nav.tickets">Tickets</span></a>
+    <div class="tab-group" tabindex="0">
+      <span class="tab"><i data-lucide="flask-conical"></i><span data-i18n="nav.test">Test</span><span class="caret">▾</span></span>
+      <div class="tab-menu">
+        <a href="/dashboard/playground.html" class="tab"><i data-lucide="message-square"></i><span data-i18n="nav.playground">Playground</span></a>
+        <a href="/dashboard/voice.html" class="tab"><i data-lucide="mic"></i><span data-i18n="nav.voice">Voice</span></a>
+        <a href="/dashboard/redteam.html" class="tab"><i data-lucide="target"></i><span data-i18n="nav.redteam">Red Team</span></a>
+      </div>
+    </div>
+    <div class="tab-group" tabindex="0">
+      <span class="tab"><i data-lucide="plug"></i><span data-i18n="nav.integrate">Integrate</span><span class="caret">▾</span></span>
+      <div class="tab-menu">
+        <a href="/dashboard/connect.html" class="tab"><i data-lucide="plus-circle"></i>Connect agent</a>
+        <a href="/dashboard/proxy.html" class="tab"><i data-lucide="plug"></i><span data-i18n="nav.proxy">Proxy</span></a>
+        <a href="/dashboard/autofix.html" class="tab"><i data-lucide="wand"></i><span data-i18n="nav.autofix">Auto-Fix</span></a>
+      </div>
+    </div>
+    <a href="/dashboard/architecture.html" class="tab"><i data-lucide="layers"></i><span data-i18n="nav.architecture">Architecture</span></a>
+  </nav>
+  <div class="topbar-right">
+    <div class="status-pill"><span class="dot"></span><span data-i18n="status.live">live</span></div>
+  </div>
+</header>
+
+<main class="arch-main">
+
+  <section class="arch-hero" id="ag-hero">
+    <div class="arch-hero-text">
+      <div class="pg-hero-eyebrow" id="ag-vertical">—</div>
+      <h1 class="arch-hero-title" id="ag-name">Loading agent…</h1>
+      <p class="arch-hero-sub" id="ag-desc">—</p>
+      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="rt-run-btn" id="ag-run-redteam" style="background:linear-gradient(135deg,var(--red),#7a0014);color:white;">⚡ Run Red Team on this agent</button>
+        <a id="ag-view-tickets" class="rt-export-btn" href="/dashboard/tickets.html">📋 View tickets</a>
+      </div>
+    </div>
+    <div class="arch-hero-metrics">
+      <div class="metric-card"><div class="metric-val" id="ag-total">0</div><div class="metric-lbl">Total interactions</div></div>
+      <div class="metric-card"><div class="metric-val" id="ag-criticals" style="color:#fca5a5;">0</div><div class="metric-lbl">Criticals caught</div></div>
+      <div class="metric-card"><div class="metric-val" id="ag-warnings" style="color:#fcd34d;">0</div><div class="metric-lbl">Warnings</div></div>
+      <div class="metric-card"><div class="metric-val" id="ag-status">—</div><div class="metric-lbl">Status</div></div>
+    </div>
+  </section>
+
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>Violations breakdown</h2>
+      <p class="muted">Findings caught against this agent, grouped by regulation.</p>
+    </div>
+    <div class="ag-reg-grid" id="ag-reg-grid">
+      <div class="muted">Loading…</div>
+    </div>
+  </section>
+
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>Recent interactions</h2>
+      <p class="muted">Last 50 audited exchanges for this agent. Click any row for the full forensic detail.</p>
+    </div>
+    <div class="feed-table-wrap">
+      <table class="feed-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Severity</th>
+            <th>Channel</th>
+            <th>User said</th>
+            <th>Bot replied</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="ag-interactions">
+          <tr><td colspan="6" class="muted" style="padding:24px;text-align:center;">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  ARCA SENTRY · Continuous compliance auditing for enterprise AI
+</footer>
+
+<script src="/dashboard/static/agent.js"></script>
+<script src="/dashboard/static/i18n.js"></script>
+<script>if (window.lucide) window.lucide.createIcons();</script>
+</body>
+</html>

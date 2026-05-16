@@ -1,0 +1,153 @@
+/* Connect/Register page + agent profile shared styles */
+
+.cn-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 12px;
+}
+.cn-row label, .cn-full {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-top: 4px;
+}
+.cn-full { margin-top: 12px; }
+.cn-row label > span, .cn-full > span {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.cn-row input, .cn-row select, .cn-full textarea, .cn-full input {
+  background: var(--bg-elev);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+}
+.cn-row input:focus, .cn-row select:focus, .cn-full textarea:focus {
+  outline: none; border-color: var(--blue-500);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.cn-channel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+.cn-channel {
+  background: var(--bg-elev);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r);
+  padding: 16px 18px;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--t-fast);
+  position: relative;
+  font: inherit;
+  color: var(--ink);
+}
+.cn-channel:hover { border-color: var(--blue-500); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.cn-channel.selected {
+  border-color: var(--blue-500);
+  background: var(--blue-50);
+  box-shadow: var(--shadow-sm), inset 0 0 0 1px var(--blue-500);
+}
+.cn-channel.disabled { opacity: 0.7; }
+.cn-ch-icon { font-size: 28px; margin-bottom: 6px; }
+.cn-ch-name { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.cn-ch-desc { font-size: 11.5px; line-height: 1.5; color: var(--ink-2); }
+.cn-ch-badge {
+  position: absolute; top: 12px; right: 12px;
+  font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  padding: 2px 8px; border-radius: var(--r-full);
+  background: var(--green-50); color: var(--green); border: 1px solid var(--green-300);
+}
+.cn-ch-badge.soon {
+  background: #fef3c7; color: var(--amber); border-color: var(--amber-300);
+}
+
+.cn-channel-config {
+  margin-top: 16px;
+  padding: 16px 18px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+}
+.cn-channel-config label {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-top: 8px;
+}
+.cn-channel-config label > span {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-3);
+}
+.cn-channel-config input, .cn-channel-config select {
+  background: white; border: 1.5px solid var(--line); border-radius: var(--r-sm);
+  padding: 10px 14px; font: inherit; font-size: 13px;
+}
+.cn-channel-config input:focus, .cn-channel-config select:focus {
+  outline: none; border-color: var(--blue-500); box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+}
+
+.cn-result {
+  margin-top: 16px;
+  padding: 16px 18px;
+  background: var(--green-50);
+  border: 1px solid var(--green-300);
+  border-radius: var(--r-sm);
+}
+.cn-result.error { background: var(--red-50); border-color: var(--red-300); }
+.cn-result h3 { font-size: 13px; color: var(--green); margin-bottom: 8px; }
+.cn-result.error h3 { color: var(--red); }
+.cn-result code {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  background: white;
+  padding: 10px 14px;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--line);
+  margin: 6px 0;
+  word-break: break-all;
+}
+.cn-result-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.cn-result-actions a, .cn-result-actions button {
+  background: var(--blue-500);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: var(--r-sm);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+}
+.cn-result-actions a:hover, .cn-result-actions button:hover {
+  background: var(--blue-700); color: white; text-decoration: none;
+}
+
+/* Agent profile — regulation breakdown grid */
+.ag-reg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+.ag-reg-item {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--blue-500);
+  border-radius: var(--r-sm);
+  padding: 12px 16px;
+}
+.ag-reg-name { font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--ink-3); }
+.ag-reg-count { font-size: 24px; font-weight: 800; color: var(--ink); margin-top: 4px; line-height: 1; }
+.ag-reg-sub { font-size: 10px; color: var(--ink-4); margin-top: 4px; }
+
+@media (max-width: 800px) {
+  .cn-row { grid-template-columns: 1fr; }
+}

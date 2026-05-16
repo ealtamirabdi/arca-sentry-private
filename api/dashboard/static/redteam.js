@@ -37,6 +37,7 @@ async function loadAgents() {
 function renderAgentCard(a) {
   const card = document.createElement('div');
   card.className = 'rt-agent-card';
+  card.title = 'Click anywhere on this card to open the agent profile · use the red button to run pen test';
   const lastTime = a.last_audited_at
     ? new Date(a.last_audited_at).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })
     : '—';
@@ -73,9 +74,29 @@ function renderAgentCard(a) {
 
     <button class="rt-ag-cta">⚡ Run pen test</button>
   `;
-  card.querySelector('.rt-ag-cta').onclick = () => runOnAgent(a);
+  card.querySelector('.rt-ag-cta').onclick = (e) => { e.stopPropagation(); runOnAgent(a); };
+  // Click anywhere else opens the agent profile page
+  card.onclick = () => { window.location.href = `/dashboard/agent.html?id=${a.id}`; };
   return card;
 }
+
+// Auto-prefill if URL has ?prefill=<id>
+(function autoPrefill() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('prefill');
+  if (!id) return;
+  // Wait for catalog to load then auto-run
+  const tryRun = () => {
+    const cards = document.querySelectorAll('.rt-agent-card');
+    if (cards.length === 0) { setTimeout(tryRun, 300); return; }
+    // Resolve agent from catalog
+    fetch('/agents').then((r) => r.json()).then((d) => {
+      const agent = d.agents.find((a) => a.id === id);
+      if (agent) runOnAgent(agent);
+    });
+  };
+  setTimeout(tryRun, 600);
+})();
 
 async function runOnAgent(agent) {
   $('#rt-running-card').style.display = 'block';

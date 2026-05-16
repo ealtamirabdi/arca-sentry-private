@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ARCA SENTRY — Connect agent</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/dashboard/static/style.css">
+<link rel="stylesheet" href="/dashboard/static/architecture.css">
+<link rel="stylesheet" href="/dashboard/static/extras.css">
+<link rel="stylesheet" href="/dashboard/static/polish.css">
+<link rel="stylesheet" href="/dashboard/static/connect.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-logo"><span class="brand-logo-letter">S</span></div>
+    <div class="brand-text">
+      <div class="brand-name">ARCA <strong>SENTRY</strong></div>
+      <div class="brand-sub">Connect a new agent</div>
+    </div>
+  </div>
+  <nav class="tabs">
+    <a href="/dashboard/" class="tab"><i data-lucide="layout-dashboard"></i><span data-i18n="nav.dashboard">Dashboard</span></a>
+    <a href="/dashboard/tickets.html" class="tab"><i data-lucide="ticket"></i><span data-i18n="nav.tickets">Tickets</span></a>
+    <div class="tab-group" tabindex="0">
+      <span class="tab"><i data-lucide="flask-conical"></i><span data-i18n="nav.test">Test</span><span class="caret">▾</span></span>
+      <div class="tab-menu">
+        <a href="/dashboard/playground.html" class="tab"><i data-lucide="message-square"></i><span data-i18n="nav.playground">Playground</span></a>
+        <a href="/dashboard/voice.html" class="tab"><i data-lucide="mic"></i><span data-i18n="nav.voice">Voice</span></a>
+        <a href="/dashboard/redteam.html" class="tab"><i data-lucide="target"></i><span data-i18n="nav.redteam">Red Team</span></a>
+      </div>
+    </div>
+    <div class="tab-group has-active" tabindex="0">
+      <span class="tab"><i data-lucide="plug"></i><span data-i18n="nav.integrate">Integrate</span><span class="caret">▾</span></span>
+      <div class="tab-menu">
+        <a href="/dashboard/connect.html" class="tab active"><i data-lucide="plus-circle"></i>Connect agent</a>
+        <a href="/dashboard/proxy.html" class="tab"><i data-lucide="plug"></i><span data-i18n="nav.proxy">Proxy</span></a>
+        <a href="/dashboard/autofix.html" class="tab"><i data-lucide="wand"></i><span data-i18n="nav.autofix">Auto-Fix</span></a>
+      </div>
+    </div>
+    <a href="/dashboard/architecture.html" class="tab"><i data-lucide="layers"></i><span data-i18n="nav.architecture">Architecture</span></a>
+  </nav>
+  <div class="topbar-right">
+    <div class="status-pill"><span class="dot"></span><span data-i18n="status.live">live</span></div>
+  </div>
+</header>
+
+<main class="arch-main">
+
+  <section class="arch-hero">
+    <div class="arch-hero-text">
+      <div class="pg-hero-eyebrow">Onboard a new AI agent</div>
+      <h1 class="arch-hero-title">Connect any chatbot, voice agent, or LLM API</h1>
+      <p class="arch-hero-sub">Pick how your agent reaches its end users. SENTRY supports drop-in proxy mode, raw HTTP endpoint testing, web chat-widget scanning, and (coming soon) WhatsApp Business + Facebook Messenger.</p>
+    </div>
+    <div class="arch-hero-metrics">
+      <div class="metric-card"><div class="metric-val">5</div><div class="metric-lbl">Channels supported</div></div>
+      <div class="metric-card"><div class="metric-val">~30 s</div><div class="metric-lbl">Time to register</div></div>
+      <div class="metric-card"><div class="metric-val">12+</div><div class="metric-lbl">Attacks ready to fire</div></div>
+      <div class="metric-card"><div class="metric-val">5</div><div class="metric-lbl">Regulations covered</div></div>
+    </div>
+  </section>
+
+  <!-- STEP 1: identity -->
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>Step 1 · Agent identity</h2>
+      <p class="muted">Give the agent a memorable name. This is how it'll appear in dashboards and tickets.</p>
+    </div>
+    <div class="cn-row">
+      <label><span>Name</span><input id="cn-name" type="text" placeholder="e.g. ACME Bank · loan-decision bot"></label>
+      <label><span>Vertical</span>
+        <select id="cn-vertical">
+          <option>Banking</option><option>Insurance</option><option>Healthcare</option>
+          <option>Public sector</option><option>Retail</option><option>Telco</option><option>Other</option>
+        </select>
+      </label>
+      <label><span>Icon</span>
+        <select id="cn-icon">
+          <option>🏦</option><option>🛡️</option><option>🏥</option><option>🏛️</option>
+          <option>🛒</option><option>📞</option><option>🤖</option><option>💼</option>
+        </select>
+      </label>
+    </div>
+    <label class="cn-full">
+      <span>Short description (optional)</span>
+      <textarea id="cn-desc" rows="2" placeholder="What this agent does, regulatory profile, any context for the audit team…"></textarea>
+    </label>
+  </section>
+
+  <!-- STEP 2: connection -->
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>Step 2 · How does it reach end users?</h2>
+      <p class="muted">Pick the channel. Each option configures SENTRY's interception strategy.</p>
+    </div>
+    <div class="cn-channel-grid" id="cn-channel-grid">
+      <button class="cn-channel selected" data-channel="proxy">
+        <div class="cn-ch-icon">🔌</div>
+        <div class="cn-ch-name">Proxy mode</div>
+        <div class="cn-ch-desc">Drop-in for OpenAI / Anthropic / Gemini SDKs. Change one line, you're protected.</div>
+        <div class="cn-ch-badge avail">Available</div>
+      </button>
+      <button class="cn-channel" data-channel="http">
+        <div class="cn-ch-icon">📡</div>
+        <div class="cn-ch-name">HTTP endpoint</div>
+        <div class="cn-ch-desc">Your bot exposes a REST endpoint. SENTRY hits it directly with the attack suite.</div>
+        <div class="cn-ch-badge avail">Available</div>
+      </button>
+      <button class="cn-channel" data-channel="web_url">
+        <div class="cn-ch-icon">🌐</div>
+        <div class="cn-ch-name">Live web chat</div>
+        <div class="cn-ch-desc">Paste your client's website URL — SENTRY uses Playwright to drive the chat widget in headless mode and pen-test it.</div>
+        <div class="cn-ch-badge soon">Coming soon</div>
+      </button>
+      <button class="cn-channel" data-channel="whatsapp">
+        <div class="cn-ch-icon">💬</div>
+        <div class="cn-ch-name">WhatsApp Business</div>
+        <div class="cn-ch-desc">Requires Twilio / 360dialog / Meta WABA + approved business number. SENTRY sends the attack suite to your bot via the WABA pipeline.</div>
+        <div class="cn-ch-badge soon">Coming soon</div>
+      </button>
+      <button class="cn-channel" data-channel="facebook">
+        <div class="cn-ch-icon">📘</div>
+        <div class="cn-ch-name">Facebook Messenger</div>
+        <div class="cn-ch-desc">Requires a Page Access Token and Meta App. SENTRY attacks your bot through the Graph API.</div>
+        <div class="cn-ch-badge soon">Coming soon</div>
+      </button>
+    </div>
+
+    <!-- Channel-specific inputs -->
+    <div class="cn-channel-config" id="cn-config-proxy">
+      <p class="muted">When you save, SENTRY will give you a personalised proxy URL. Point your client's <code>base_url</code> there — every call is then audited live.</p>
+      <label><span>Upstream provider</span>
+        <select id="cn-upstream">
+          <option value="openai">OpenAI</option><option value="anthropic">Anthropic</option><option value="gemini">Google Gemini</option>
+        </select>
+      </label>
+    </div>
+    <div class="cn-channel-config" id="cn-config-http" style="display:none;">
+      <label><span>HTTP endpoint URL</span>
+        <input id="cn-endpoint" type="url" placeholder="https://api.client.com/chatbot/v1/message">
+      </label>
+      <p class="muted small">SENTRY POSTs <code>{ "prompt": "..." }</code> to this URL with your auth header, treats the body as the bot's reply.</p>
+    </div>
+    <div class="cn-channel-config" id="cn-config-web_url" style="display:none;">
+      <label><span>Public site URL (where the chat widget lives)</span>
+        <input id="cn-website" type="url" placeholder="https://client-website.com/contact">
+      </label>
+      <p class="muted small">Coming soon — Playwright will scan the page for a chat widget and drive it headless.</p>
+    </div>
+    <div class="cn-channel-config" id="cn-config-whatsapp" style="display:none;">
+      <p class="muted">Coming soon. Will require: WhatsApp Business API provider (Twilio / 360dialog / Meta WABA), business number, system-user access token.</p>
+    </div>
+    <div class="cn-channel-config" id="cn-config-facebook" style="display:none;">
+      <p class="muted">Coming soon. Will require: Facebook App ID + secret, Page Access Token, page subscribed to messaging webhook.</p>
+    </div>
+  </section>
+
+  <!-- STEP 3: register -->
+  <section class="card arch-card">
+    <div class="card-head">
+      <h2>Step 3 · Register & start</h2>
+      <p class="muted">When you click below, the agent shows up in the catalog. You can run Red Team against it immediately.</p>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <button class="rt-run-btn" id="cn-submit" style="background:linear-gradient(135deg,var(--blue-500),var(--blue-700));">✓ Register agent</button>
+      <span class="muted small" id="cn-status">Ready.</span>
+    </div>
+    <div class="cn-result" id="cn-result" style="display:none;"></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  ARCA SENTRY · Continuous compliance auditing for enterprise AI
+</footer>
+
+<script src="/dashboard/static/connect.js"></script>
+<script src="/dashboard/static/i18n.js"></script>
+<script>if (window.lucide) window.lucide.createIcons();</script>
+</body>
+</html>

@@ -34,6 +34,7 @@ from synthesizer.gemini_client import Synthesizer
 
 from api.routes import alerts, audit, reports, demo, stats, playground, tickets, proxy, redteam, autofix
 from api.routes import agents as agents_route
+from api.routes import agents_register
 
 log = logging.getLogger(__name__)
 
@@ -84,6 +85,9 @@ async def lifespan(app: FastAPI):
     redteam.set_state(state)
     autofix.set_state(state)
     agents_route.set_state(state)
+    agents_register.set_state(state)
+    # Expose public base URL for connect/register
+    state.public_base_url = ""
 
     yield
 
@@ -112,6 +116,7 @@ app.include_router(proxy.router)
 app.include_router(redteam.router)
 app.include_router(autofix.router)
 app.include_router(agents_route.router)
+app.include_router(agents_register.router)
 
 
 @app.get("/health")
