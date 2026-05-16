@@ -214,6 +214,135 @@ async def attack_catalog() -> dict[str, Any]:
     }
 
 
+@router.post("/report.pdf")
+async def export_report_pdf(report: dict[str, Any]):
+    """Generate a downloadable PDF report from a /redteam/run response."""
+    from fastapi.responses import Response
+    from synthesizer.report_generator import render_pdf
+    import tempfile
+    from pathlib import Path
+
+    html = _render_redteam_html(report)
+    with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+        path = Path(tmp.name)
+    try:
+        render_pdf(html, path)
+        pdf_bytes = path.read_bytes()
+    finally:
+        path.unlink(missing_ok=True)
+
+    filename = f"sentry-redteam-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M')}.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+def _render_redteam_html(report: dict[str, Any]) -> str:
+    """Build the printable HTML for a red-team run."""
+    summary = report.get("summary", {})
+    target = report.get("target", {})
+    results = report.get("results", [])
+    score = summary.get("resilience_score", 0)
+    total = summary.get("total", 0)
+    vuln = summary.get("vulnerable", 0)
+    completed = report.get("completed_at", "")
+
+    score_color = "#15803d" if score >= 85 else ("#b45309" if score >= 60 else "#b91c1c")
+    verdict = ("Strong resilience" if score >= 85
+               else "Several gaps — review red rows" if score >= 60
+               else "Major gaps — urgent remediation needed")
+
+    cat_rows = "\n".join(
+        f'<tr><td>{html_escape(cat)}</td>'
+        f'<td>{b["total"]}</td>'
+        f'<td>{b["vulnerable"]}</td>'
+        f'<td>{(b["total"] - b["vulnerable"])}</td></tr>'
+        for cat, b in summary.get("by_category", {}).items()
+    )
+
+    result_rows = ""
+    for r in results:
+        row_color = "#fee2e2" if r.get("vulnerable") else "#dcfce7"
+        verdict_text = "VULNERABLE" if r.get("vulnerable") else "RESISTED"
+        verdict_color = "#b91c1c" if r.get("vulnerable") else "#15803d"
+        result_rows += (
+            f'<tr style="background:{row_color}">'
+            f'<td><b>{html_escape(r.get("category", ""))}</b></td>'
+            f'<td>{html_escape(r.get("name", ""))}</td>'
+            f'<td style="color:{verdict_color};font-weight:700;text-align:center;">{verdict_text}</td>'
+            f'</tr>'
+            f'<tr><td colspan="3" style="background:white;font-size:9pt;color:#444;padding:6pt 12pt;">'
+            f'<b>Attack:</b> {html_escape(r.get("prompt", "")[:300])}<br>'
+            f'<b>Response:</b> {html_escape(r.get("response", "")[:400])}'
+            f'</td></tr>'
+        )
+
+    return f"""<!doctype html>
+<html><head><meta charset="utf-8"><title>SENTRY · Red Team Report</title>
+<style>
+  @page {{ size: A4; margin: 1.6cm; }}
+  body {{ font-family: 'Georgia', serif; color: #111; font-size: 10pt; line-height: 1.55; }}
+  h1 {{ font-size: 22pt; color: #1e3a8a; margin: 0 0 6pt; }}
+  h2 {{ font-size: 13pt; color: #1e3a8a; border-bottom: 1px solid #c1cce0; padding-bottom: 3pt; margin-top: 18pt; }}
+  .header-strip {{ background: #0b1a33; color: white; padding: 14pt 18pt; margin: -20pt -20pt 20pt; border-bottom: 4px solid #2563eb; }}
+  .header-strip h1 {{ color: white; font-size: 18pt; }}
+  .header-strip .sub {{ color: #6e95cf; font-size: 9pt; margin-top: 3pt; }}
+  .meta {{ background: #f1f5fa; padding: 10pt 14pt; border-left: 4px solid #2563eb; margin: 8pt 0; font-size: 10pt; }}
+  .meta strong {{ color: #1e3a8a; }}
+  .score-band {{ background: linear-gradient(135deg, #0b1a33, #142d5a); color: white; padding: 16pt 20pt; border-radius: 6pt; margin: 14pt 0; display: flex; align-items: center; gap: 20pt; }}
+  .score-val {{ font-size: 42pt; font-weight: 900; color: {score_color}; line-height: 1; }}
+  .score-lbl {{ font-size: 9pt; color: #cfdcef; text-transform: uppercase; letter-spacing: 1.2pt; }}
+  .verdict {{ font-size: 11pt; color: #cfdcef; }}
+  table {{ width: 100%; border-collapse: collapse; margin: 8pt 0; font-size: 9.5pt; }}
+  th {{ background: #1e3a8a; color: white; text-align: left; padding: 6pt 10pt; font-size: 9pt; text-transform: uppercase; letter-spacing: 0.8pt; }}
+  td {{ padding: 5pt 10pt; border-bottom: 1px solid #d8e0ed; vertical-align: top; }}
+  footer {{ margin-top: 24pt; font-size: 8pt; color: #888; text-align: center; border-top: 1px solid #ddd; padding-top: 6pt; }}
+</style></head>
+<body>
+  <div class="header-strip">
+    <h1>ARCA SENTRY · Red Team Report</h1>
+    <div class="sub">Automated adversarial assessment</div>
+  </div>
+
+  <div class="meta">
+    <strong>Target:</strong> {html_escape(target.get("provider", ""))} / {html_escape(target.get("model", ""))}<br>
+    <strong>Run date:</strong> {html_escape(completed)}<br>
+    <strong>Attacks executed:</strong> {total} ({vuln} successful · {total - vuln} resisted)
+  </div>
+
+  <div class="score-band">
+    <div>
+      <div class="score-val">{score}%</div>
+      <div class="score-lbl">Resilience score</div>
+    </div>
+    <div class="verdict">{verdict}</div>
+  </div>
+
+  <h2>1. Summary by category</h2>
+  <table>
+    <thead><tr><th>Category</th><th>Total</th><th>Vulnerable</th><th>Resisted</th></tr></thead>
+    <tbody>{cat_rows}</tbody>
+  </table>
+
+  <h2>2. Detailed results</h2>
+  <table>
+    <thead><tr><th>Category</th><th>Attack</th><th>Verdict</th></tr></thead>
+    <tbody>{result_rows}</tbody>
+  </table>
+
+  <footer>
+    Generated by ARCA SENTRY · Continuous compliance auditing for enterprise AI
+  </footer>
+</body></html>
+"""
+
+
+def html_escape(s: object) -> str:
+    return (str(s) if s is not None else "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+
+
 @router.post("/run")
 async def run_redteam(target: RedTeamTarget) -> dict[str, Any]:
     """Run the full attack suite against the target. Returns aggregated
