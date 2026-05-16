@@ -298,11 +298,12 @@
   to { opacity: 1; transform: translateY(0); }
 }
 .msg.user {
-  background: var(--user-bubble);
-  color: white;
+  background: #f97316 !important;
+  color: white !important;
   align-self: flex-end;
-  border-radius: 14px 14px 4px 14px;
+  border-bottom-right-radius: 4px;
   padding: 10px 14px;
+  box-shadow: 0 1px 3px rgba(249, 115, 22, 0.25);
 }
 .msg.bot {
   background: var(--bg-elev);

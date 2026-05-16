@@ -111,14 +111,24 @@
   max-width: 86%;
 }
 .transcript-line.user {
-  background: var(--gold);
-  color: white;
+  background: #f97316 !important;
+  color: white !important;
   align-self: flex-end;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 1px 3px rgba(249, 115, 22, 0.25);
+}
+.transcript-line.user .meta {
+  color: rgba(255, 255, 255, 0.85) !important;
 }
 .transcript-line.user.partial {
-  background: var(--gold-l);
-  color: var(--ink);
+  background: #ffedd5 !important;
+  color: #7c2d12 !important;
   font-style: italic;
+  border: 1.5px dashed #fb923c;
+  box-shadow: none;
+}
+.transcript-line.user.partial .meta {
+  color: #9a3412 !important;
 }
 .transcript-line.bot {
   background: var(--bg-elev);
