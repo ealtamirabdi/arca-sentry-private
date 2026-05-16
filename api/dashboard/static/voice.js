@@ -84,7 +84,10 @@ function setupSpeechRecognition() {
     $('#mic-btn').classList.add('recording');
     $('#mic-btn .mic-label').textContent = 'Listening — release';
     setTranscriptState('● recording — speak now', true);
-    appendUserLine('', true);
+    // No partial line — we append the user line ONCE in onend with the final text.
+    // Live interim updates go to the transcript-state badge so the user sees we're listening.
+    lastFinalText = '';
+    lastInterimText = '';
   };
 
   recognition.onresult = (event) => {
@@ -95,16 +98,10 @@ function setupSpeechRecognition() {
       if (r.isFinal) final += r[0].transcript;
       else interim += r[0].transcript;
     }
-    const display = (final + interim).trim();
-    if (liveTextNode && display) {
-      liveTextNode.textContent = display;
-    }
-    if (final) {
-      lastFinalText = final.trim();
-    }
-    if (interim) {
-      lastInterimText = interim.trim();
-    }
+    if (final) lastFinalText = (lastFinalText + ' ' + final).trim();
+    if (interim) lastInterimText = interim.trim();
+    const live = (lastFinalText + ' ' + interim).trim();
+    if (live) setTranscriptState('● ' + live, true);
   };
 
   recognition.onerror = (e) => {
@@ -129,29 +126,21 @@ function setupSpeechRecognition() {
     $('#mic-btn').classList.remove('recording');
     $('#mic-btn .mic-label').textContent = 'Hold to talk';
 
-    // Fallback for Safari/Chrome: if no final transcript arrived but we
-    // captured an interim, treat it as final. Web Speech API in Safari often
-    // never delivers isFinal=true even though the recognition worked fine.
-    const captured = lastFinalText || lastInterimText;
-    if (liveTextNode && captured) {
-      liveTextNode.parentElement.classList.remove('partial');
-      liveTextNode.textContent = captured;
-    } else if (liveTextNode && !captured) {
-      liveTextNode.parentElement.remove();
-    }
-
+    // Capture whatever Web Speech delivered. Safari often only emits interim.
+    const captured = (lastFinalText || lastInterimText || '').trim();
     if (!captured) {
       setTranscriptState('no speech captured — try again', false);
       return;
     }
-    // Use whichever we got
+    // Append the user line with the final text. Done ONCE — no mutation, no
+    // empty intermediate node, no liveTextNode race condition.
+    appendUserLine(captured, false);
     lastFinalText = captured;
 
     setTranscriptState('auditing…', false);
     await processUtterance(lastFinalText);
     lastFinalText = '';
     lastInterimText = '';
-    liveTextNode = null;
     setTranscriptState('tap mic to start', false);
   };
 }
@@ -262,23 +251,22 @@ function setTranscriptState(text, live) {
 
 /* ───────────────────────── Transcript stream ───────────────────────── */
 
-function appendUserLine(text, partial) {
+function appendUserLine(text, _partial) {
   const stream = $('#transcript-stream');
   const empty = stream.querySelector('.empty-chat');
   if (empty) empty.remove();
 
   const wrap = document.createElement('div');
-  wrap.className = 'transcript-line user' + (partial ? ' partial' : '');
+  wrap.className = 'transcript-line user';
   const meta = document.createElement('div');
   meta.className = 'meta';
   meta.textContent = `user · ${currentLang}`;
   const body = document.createElement('div');
-  body.textContent = text || '…';
+  body.textContent = text;
   wrap.appendChild(meta);
   wrap.appendChild(body);
   stream.appendChild(wrap);
   stream.scrollTop = stream.scrollHeight;
-  if (partial) liveTextNode = body;
 }
 
 function appendBotLine(text, severity, action) {
