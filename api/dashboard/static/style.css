@@ -45,6 +45,13 @@
   --amber:         #b45309;
   --amber-50:      #fef3c7;
   --amber-300:     #fbbf24;
+  /* user-bubble tokens — orange, visually distinct from blue assistant bubbles */
+  --user-bubble:     #f97316;          /* orange-500: solid user bubble */
+  --user-bubble-l:   #ffedd5;          /* orange-100: interim/partial bubble bg */
+  --user-bubble-ink: #7c2d12;          /* orange-900: text on partial bubble */
+  /* legacy alias so old CSS references --gold / --gold-l still render */
+  --gold:            var(--user-bubble);
+  --gold-l:          var(--user-bubble-l);
   --red:           #b91c1c;
   --red-50:        #fee2e2;
   --red-300:       #f87171;
